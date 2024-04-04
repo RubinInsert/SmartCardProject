@@ -33,6 +33,7 @@ public class SystemInterface
                 displayMainScreen();
                 break;
             case 1: // Create a new Smart Card
+                createSmartCard();
                 break;
             case 2: // Create a new Journey
                 break;
@@ -61,11 +62,19 @@ public class SystemInterface
             SmartCard newTempCard = new SmartCard();
             newTempCard.setSmartCardID(currentIDNumber); // Assign a new ID number and add one to the global variable to make sure the next card has a new number
             currentIDNumber += 1;
+
+            
         } else { // There is no empty card slot
-            clearScreen();
-            System.out.println("You have reached max number of cards. You cannot create a new card until you delete one!");
-            displayMainScreen();
+            showError("You have reached max number of cards. You cannot create a new card until you delete one!");
         }
+    }
+    void showError(String errorMessage) {
+        clearScreen();
+        System.out.println("==============================Error==============================");
+        System.out.println(errorMessage);
+        System.out.println("=================================================================");
+        displayMainScreen();
+
     }
     public static void main(String[] args)
     {
