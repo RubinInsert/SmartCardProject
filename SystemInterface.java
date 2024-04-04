@@ -1,8 +1,9 @@
 import java.util.Scanner;
-
+import java.util.concurrent.ThreadLocalRandom;
 public class SystemInterface
 {
     static Scanner input;
+    static int currentIDNumber = 0;
     SmartCard smartCard1;
     SmartCard smartCard2;
     SmartCard smartCard3;
@@ -52,8 +53,19 @@ public class SystemInterface
                 break;
         }
     }
-    void clearScreen() { // Creates a lot of new lines -> Not system specific unlike "cls" for windows.
+    void clearScreen() { // Creates a lot of new lines to clear the window -> Not system specific unlike "cls" for windows.
         System.out.println("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n");
+    }
+    void createSmartCard() {
+        if(smartCard1 != null || smartCard2 != null || smartCard3 != null) { // If there is an empty card slot available 
+            SmartCard newTempCard = new SmartCard();
+            newTempCard.setSmartCardID(currentIDNumber); // Assign a new ID number and add one to the global variable to make sure the next card has a new number
+            currentIDNumber += 1;
+        } else { // There is no empty card slot
+            clearScreen();
+            System.out.println("You have reached max number of cards. You cannot create a new card until you delete one!");
+            displayMainScreen();
+        }
     }
     public static void main(String[] args)
     {
