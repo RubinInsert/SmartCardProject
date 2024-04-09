@@ -59,9 +59,32 @@ public class SystemInterface
     }
     void createSmartCard() {
         if(smartCard1 != null || smartCard2 != null || smartCard3 != null) { // If there is an empty card slot available 
-            SmartCard newTempCard = new SmartCard();
-            newTempCard.setSmartCardID(currentIDNumber); // Assign a new ID number and add one to the global variable to make sure the next card has a new number
-            currentIDNumber += 1;
+            char type = ' ';
+            double balance;
+            System.out.println("What Type of Card are you creating?");
+            System.out.println("1. Child");
+            System.out.println("2. Senior");
+            System.out.println("3. Adult");
+            System.out.print("Enter menu number: ");
+            int in = input.nextInt();
+            switch (in) {
+                case 1: // User chose "Child"
+                    type = 'C';
+                    break;
+                case 2: // User chose "Senior"
+                    type = 'S';
+                    break;
+                case 3: // User chose "Adult"
+                    type = 'A';
+                    break;
+                default:
+                    showError("The number you inputted was out of the range of the menu!");
+                    return;
+            }
+            System.out.println("Enter the balance you wish to load onto the card: "); // TODO: Add input checks e.g. if user inputs negative number, or some bs.
+            balance = input.nextDouble();
+            SmartCard newTempCard = new SmartCard(currentIDNumber, type, balance);
+            currentIDNumber += 1; // add one to the global variable to make sure the next card has a new number for it's ID.
 
             
         } else { // There is no empty card slot
