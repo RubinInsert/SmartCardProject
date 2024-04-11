@@ -10,7 +10,7 @@ public class SystemInterface
     private void run()
     {
         clearScreen();
-        System.out.println(displayMainScreen());
+        selectPage(displayMainScreen());
         //This method should control the flow of the program
     }
     int displayMainScreen() { // Returns the number the user returns when selecting a menu item. I.e. "Create a new Smart Card" -> returns 1.
@@ -58,7 +58,7 @@ public class SystemInterface
         System.out.println("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n");
     }
     void createSmartCard() {
-        if(smartCard1 != null || smartCard2 != null || smartCard3 != null) { // If there is an empty card slot available 
+        if(smartCard1 == null || smartCard2 == null || smartCard3 == null) { // If there is an empty card slot available 
             char type = ' ';
             double balance;
             System.out.println("What Type of Card are you creating?");
@@ -85,7 +85,7 @@ public class SystemInterface
             balance = input.nextDouble();
             SmartCard newTempCard = new SmartCard(currentIDNumber, type, balance);
             currentIDNumber += 1; // add one to the global variable to make sure the next card has a new number for it's ID.
-
+            sortSmartCards(newTempCard);
             
         } else { // There is no empty card slot
             showError("You have reached max number of cards. You cannot create a new card until you delete one!");
@@ -98,6 +98,15 @@ public class SystemInterface
         System.out.println("=================================================================");
         displayMainScreen();
 
+    }
+    void sortSmartCards(SmartCard sc) { // Place the new smartcard in the earliest available slot
+        if(smartCard1 == null) { 
+            smartCard1 = sc;
+        } else if(smartCard2 == null) {
+            smartCard2 = sc;
+        } else if(smartCard3 == null) {
+            smartCard3 = sc;
+        }
     }
     public static void main(String[] args)
     {
