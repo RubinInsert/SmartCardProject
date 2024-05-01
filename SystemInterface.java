@@ -40,6 +40,7 @@ public class SystemInterface
             case 2: // Create a new Journey
                 break;
             case 3: // Delete a Smart Card
+                deleteSmartCard();
                 break;
             case 4: // Delete a Journey
                 break;
@@ -129,6 +130,28 @@ public class SystemInterface
         System.out.println("Type: " + sc.getType());
         System.out.println("Card Balance: " + sc.getBalance());
         System.out.println("=================================================================");
+
+    
+    void deleteSmartCard() {
+        clearScreen();
+        System.out.print("Enter the Smart Card ID you want to delete: ");
+        int idToDelete = input.nextInt();
+        if (smartCard1 != null && smartCard1.getSmartCardID() == idToDelete) {
+            smartCard1 = null;
+            System.out.println("Smart Card with ID " + idToDelete + " has been deleted.");
+        } else if (smartCard2 != null && smartCard2.getSmartCardID() == idToDelete) {
+            smartCard2 = null;
+            System.out.println("Smart Card with ID " + idToDelete + " has been deleted.");
+        } else if (smartCard3 != null && smartCard3.getSmartCardID() == idToDelete) {
+            smartCard3 = null;
+            System.out.println("Smart Card with ID " + idToDelete + " has been deleted.");
+        } else {
+            showError("Smart Card with ID " + idToDelete + " not found.");
+        }
+        displayMainScreen();
+    }
+
+        
     }
     public static void main(String[] args)
     {
