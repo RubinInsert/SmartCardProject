@@ -47,7 +47,18 @@ public class SmartCard {
     public char getType() {
         return type;
     }
-
+    public String getTypeFormatted() { // Return a prettified version of the Smart Card Type.
+        switch(type) {
+            case 'C':
+                return "CHILD";
+            case 'A':
+                return "ADULT";
+            case 'S':
+                return "SENIOR";
+            default:
+                return null;    
+        }
+    }
     /**
      * Retrieves the balance available on the smartcard.
      * @return The balance available on the smartcard.
