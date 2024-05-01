@@ -147,7 +147,7 @@ public class SmartCard {
      * @param type The card type to check.
      * @return true if the type is valid, otherwise false.
      */
-    public static boolean isValidType(char type) {
+    public boolean isValidType(char type) {
         return type == 'C' || type == 'A' || type == 'S';
     }
 }
