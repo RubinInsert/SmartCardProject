@@ -38,6 +38,7 @@ public class SystemInterface
                 createSmartCard();
                 break;
             case 2: // Create a new Journey
+                createJourney();
                 break;
             case 3: // Delete a Smart Card
                 deleteSmartCard();
@@ -151,7 +152,39 @@ public class SystemInterface
         displayMainScreen();
     }
 
-        
+    void createJourney() {
+        clearScreen();
+        input.nextLine(); // Consume newline character
+        System.out.println("Creating a new Journey:");
+
+        // Prompt user for journey details
+        System.out.print("Enter Journey ID: ");
+        int journeyID = input.nextInt();
+
+        input.nextLine(); // Consume newline character
+        System.out.print("Enter Transport Mode (train/bus/tram): ");
+        String transportMode = input.nextLine();
+
+        System.out.print("Enter Start of Journey (1-10): ");
+        int startOfJourney = input.nextInt();
+
+        System.out.print("Enter End of Journey (1-10, different from start): ");
+        int endOfJourney = input.nextInt();
+
+        System.out.print("Enter Distance of Journey: ");
+        int distanceOfJourney = input.nextInt();
+
+        // Create the journey object
+        Journey newJourney = new Journey(journeyID, transportMode, startOfJourney, endOfJourney, distanceOfJourney);
+
+        // Add the journey to a smart card (not implemented yet)
+
+        System.out.println("Journey created successfully.");
+
+        displayMainScreen();
+    }
+
+
     }
     public static void main(String[] args)
     {
