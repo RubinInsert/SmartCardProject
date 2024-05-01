@@ -1,12 +1,26 @@
 import java.util.Scanner;
 import java.util.concurrent.ThreadLocalRandom;
+
+
+/* DONE:
+ * - Main Screen
+ * - Create Smart Card Screen
+ * - Create Journey Screen
+ * - Delete Smart Card Screen
+ * - List Smart Cards Screen
+ * TODO:
+ * - Delete a Journey
+ * - List the Journeys on a Smart Card
+ * - List of Journeys with a particular transport mode and which smartcard they belong to
+ * - Summary of total cost/fare for all transportation modes journeys made by all Smartcards registered in the system.
+ */
 public class SystemInterface
 {
     static Scanner input;
-    static int currentIDNumber = 0;
-    SmartCard smartCard1;
-    SmartCard smartCard2;
-    SmartCard smartCard3;
+    static int currentIDNumber = 0; // Tracks the current Smart Card number so no smart card has the same ID
+    static SmartCard smartCard1;
+    static SmartCard smartCard2;
+    static SmartCard smartCard3;
     private void run()
     {
         clearScreen();
@@ -46,8 +60,7 @@ public class SystemInterface
             case 4: // Delete a Journey
                 break;
             case 5: // List Smart Cards
-            System.out.println("testing");
-                listAllSmartCards();
+                SmartCardUtil.listAllSmartCards();
                 displayMainScreen();
                 break;
             case 6: // List Journeys on Smart Card
@@ -61,7 +74,7 @@ public class SystemInterface
                 break;
         }
     }
-    void clearScreen() { // Creates a lot of new lines to clear the window -> Not system specific unlike "cls" for windows.
+    static void clearScreen() { // Creates a lot of new lines to clear the window -> Not system specific unlike "cls" for windows.
         System.out.println("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n");
     }
     void createSmartCard() {
@@ -94,7 +107,7 @@ public class SystemInterface
             SmartCard newTempCard = new SmartCard(currentIDNumber, type, balance);
             System.out.println("SmartCard created under ID: " + currentIDNumber);
             currentIDNumber += 1; // add one to the global variable to make sure the next card has a new number for it's ID.
-            sortSmartCards(newTempCard);
+            SmartCardUtil.sortSmartCards(newTempCard);
             displayMainScreen();
             
         } else { // There is no empty card slot
@@ -105,34 +118,12 @@ public class SystemInterface
         clearScreen();
         System.out.println("==============================Error==============================");
         System.out.println(errorMessage);
-        System.out.println("=================================================================");
         displayMainScreen();
 
     }
-    void sortSmartCards(SmartCard sc) { // Place the new smartcard in the earliest available slot
-        if(smartCard1 == null) { 
-            smartCard1 = sc;
-        } else if(smartCard2 == null) {
-            smartCard2 = sc;
-        } else if(smartCard3 == null) {
-            smartCard3 = sc;
-        }
-    }
-    void listAllSmartCards() {
-        clearScreen();
-        printSmartCard(smartCard1);
-        printSmartCard(smartCard2);
-        printSmartCard(smartCard3);
-    }
-    void printSmartCard(SmartCard sc) {
-        if(sc == null) return;
-        System.out.println("============================SMART CARD===========================");
-        System.out.println("SmartID: " + sc.getSmartCardID());
-        System.out.println("Type: " + sc.getType());
-        System.out.println("Card Balance: " + sc.getBalance());
-        System.out.println("=================================================================");
 
-    }
+
+
     void deleteSmartCard() {
         clearScreen();
         System.out.print("Enter the Smart Card ID you want to delete: ");
@@ -153,6 +144,7 @@ public class SystemInterface
     }
 
     void createJourney() {
+        if(SmartCardUtil.isAnySmartCardsCreated() == false) showError("A SmartCard must be created prior to creating a Journey!"); // If there are no smartcards active, dont allow user to create a journey
         int executionCount = 0;
         String transportMode;
         int startOfJourney, endOfJourney;
@@ -169,20 +161,24 @@ public class SystemInterface
 
 
         do {
-        if(executionCount > 0) System.out.print("Please enter only one of the provided responses."); // If this isnt the first time executing this code, send an error to user.
+        if(executionCount > 0) System.out.println("Please enter only one of the provided responses."); // If this isnt the first time executing this code, send an error to user.
         System.out.print("Enter Transport Mode (train/bus/tram): ");
         transportMode = input.nextLine().toUpperCase().trim(); // Make response uppercase for consistency, and trim any spaces before or after text. I.e. "  train" --> "TRAIN"
         executionCount++;
-        } while (!transportMode.equals("train") // If response does not match TRAIN
-                && !transportMode.equals("bus") // or BUS
-                && !transportMode.equals("tram")); // or TRAM, repeat question and ask for input until user inputs correctly
+        } while (!transportMode.equals("TRAIN") // If response does not match TRAIN
+                && !transportMode.equals("BUS") // or BUS
+                && !transportMode.equals("TRAM")); // or TRAM, repeat question and ask for input until user inputs correctly
 
 
-
-        System.out.print("Enter Start of Journey (1-10): ");
-        startOfJourney = input.nextInt();
         do {
-            if(executionCount > 0) System.out.print("Please enter only a number between 1 and 10"); // If this isnt the first time executing this code, send an error to user.
+            if(executionCount > 0) System.out.println("Please enter only a number between 1 and 10"); // If this isnt the first time executing this code, send an error to user.
+            System.out.print("Enter Start of Journey (1-10): ");
+            startOfJourney = input.nextInt();
+            executionCount++;
+        } while (startOfJourney < 1 || startOfJourney > 10);
+
+        do {
+            if(executionCount > 0) System.out.println("Please enter only a number between 1 and 10"); // If this isnt the first time executing this code, send an error to user.
             System.out.print("Enter End of Journey (1-10, different from start): ");
             endOfJourney = input.nextInt();
             executionCount++;
@@ -202,12 +198,100 @@ public class SystemInterface
         Journey newJourney = new Journey(journeyID, transportMode, startOfJourney, endOfJourney, distanceOfJourney);
 
         // Add the journey to a smart card (not implemented yet)
-
-        System.out.println("Journey created successfully.");
+        System.out.println("Which Smart Card would you like to add this journey to?");
+        int chosenCardMenuNumber;
+        int menuNumberTracker = 0; // Incase a card must be removed from the list, this number keeps track of the menu number so it doesnt skip a number.
+        for(int x = 0; x < SmartCardUtil.getSmartCardCount(); x++) {
+            if(SmartCardUtil.getSmartCard(x).hasReachedMaxJourneys()) continue; // Do not display cards which cannot have any journeys added.
+            menuNumberTracker++;
+            System.out.println(menuNumberTracker + ". ID: " + SmartCardUtil.getSmartCard(x).getSmartCardID() + " || Card Type: " + SmartCardUtil.getSmartCard(x).getType()); 
+        }
+        do {
+            if(executionCount > 0) System.out.println("Please enter a valid menu number (Between 1-" + menuNumberTracker + ")");
+            System.out.print("Enter Menu Number: ");
+            chosenCardMenuNumber = input.nextInt();
+            executionCount++;
+        } while (chosenCardMenuNumber < 1 || chosenCardMenuNumber > SmartCardUtil.getAvailableSmartCardCount());
+        int y=0;
+        for(int x = 0; x < SmartCardUtil.getSmartCardCount(); x++) { // Loop through again to find the card which corresponds with the menu number provided by the user
+            if(SmartCardUtil.getSmartCard(x).hasReachedMaxJourneys()) continue; // Skip cards with no journeys available, just like the menu.
+            y++;
+            if(y == menuNumberTracker) {
+                SmartCardUtil.getSmartCard(x).addJourney(newJourney); // Add the journey to the corresponding card.
+                System.out.println("Journey created successfully in Smart Card ID: " + SmartCardUtil.getSmartCard(x).getSmartCardID());
+            }
+        }
+        
 
         displayMainScreen();
     }
-
+    public static class SmartCardUtil { // Access functions by prefixing with SmartCardHelperFunctions..... SmartCardUtil.getSmartCard(3);
+        static int getSmartCardCount() { // Gets total number of SmartCards which exist.
+            int count = 0;
+            if(smartCard1 != null) count++;
+            if(smartCard2 != null) count++;
+            if(smartCard3 != null) count++;
+            return count;
+        }
+        static int getAvailableSmartCardCount() { // Gets total number of SmartCards which dont have all their journeys full.
+            int count = 0;
+            if(smartCard1 != null && !smartCard1.hasReachedMaxJourneys()) count++;
+            if(smartCard2 != null && !smartCard2.hasReachedMaxJourneys()) count++;
+            if(smartCard3 != null && !smartCard3.hasReachedMaxJourneys()) count++;
+            return count;
+        }
+        static SmartCard getSmartCard(int index) { // Ugly function to get around the fact we cant use arrays. Allows you to index smartcards. I.e getSmartCard(2) returns the second available smart card.
+            switch (index) {
+                case 0: 
+                if(smartCard1 != null) return smartCard1;
+                if(smartCard2 != null) return smartCard1;
+                if(smartCard3 != null) return smartCard1;
+                break;
+                case 1:
+                if (smartCard1 != null) {
+                    if(smartCard2 != null) return smartCard2;
+                    else if(smartCard3 != null) return smartCard3;
+                    return null;
+                }
+                break;
+                case 2:
+                if(smartCard3 != null) return smartCard3;
+                break;
+                default:
+                return null;
+            }
+            return null;
+        }
+        static void printSmartCard(SmartCard sc) {
+            if(sc == null) return;
+            System.out.println("============================SMART CARD===========================");
+            System.out.println("SmartID: " + sc.getSmartCardID());
+            System.out.println("Type: " + sc.getType());
+            System.out.println("Card Balance: " + sc.getBalance());
+            System.out.println("=================================================================");
+    
+        }
+        static void listAllSmartCards() {
+            clearScreen();
+            printSmartCard(smartCard1);
+            printSmartCard(smartCard2);
+            printSmartCard(smartCard3);
+        }
+        static void sortSmartCards(SmartCard sc) { // Place the new smartcard in the earliest available slot
+            if(smartCard1 == null) { 
+                smartCard1 = sc;
+            } else if(smartCard2 == null) {
+                smartCard2 = sc;
+            } else if(smartCard3 == null) {
+                smartCard3 = sc;
+            }
+        }
+        static boolean isAnySmartCardsCreated() {
+            if(smartCard1 == null && smartCard2 == null && smartCard3 == null) return false;
+            return true;
+        }
+    }
+    
 
     public static void main(String[] args)
     {

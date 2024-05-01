@@ -17,7 +17,9 @@ public class SmartCard {
     private int cardID;           // the id of the smartcard
     private char type;            // the type of the smartcard (it can be "C", "A" or "S")
     private double balance;       // the balance available on the smartcard
-
+    private Journey journey1;
+    private Journey journey2; // Only available for Adults and Seniors
+    private Journey journey3; // Only available for Seniors
     /**
      * Constructs a SmartCard object with the given card ID, type, and balance.
      * @param cardID The ID of the smartcard.
@@ -78,7 +80,37 @@ public class SmartCard {
     public boolean canDeduct(double amount) {
         return balance >= amount;
     }
-
+    public boolean hasReachedMaxJourneys() { // Determines whether a card has reached the capacity of Journeys it's specific type can hold.
+        switch (type) {
+            case 'C': // Children can have a maximum of 1 Journey
+                if(journey1 != null) return true;
+                break;
+            case 'A': // Adults can have a maxiumum of 2 Journeys
+                if(journey1 != null && journey2 != null) return true;
+            break;
+            case 'S': // Seniors can have a maximum of 3 Journeys
+                if(journey1 != null && journey2 != null && journey3 != null) return true;
+            break;
+            default:
+                return false;
+        }
+        return false;
+    }
+    public void addJourney(Journey j) {
+        reorganiseJourneys();
+        if(journey1 == null) journey1 = j;
+        else if(journey2 == null) journey2 = j;
+        else if(journey3 == null) journey3 = j;
+    }
+    private void reorganiseJourneys() { // Removes gaps in the 3 Journey variables ( if user deletes one etc. ).
+        if(journey1 == null) {
+            journey1 = journey2;
+            journey2 = journey3;
+        }
+        if(journey2 == null) {
+            journey2 = journey3;
+        }
+    }
     /**
      * Checks if the given card type is valid ("C", "A", or "S").
      * @param type The card type to check.
