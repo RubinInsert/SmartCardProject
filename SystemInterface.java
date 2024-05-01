@@ -132,7 +132,7 @@ public class SystemInterface
         System.out.println("Card Balance: " + sc.getBalance());
         System.out.println("=================================================================");
 
-    
+    }
     void deleteSmartCard() {
         clearScreen();
         System.out.print("Enter the Smart Card ID you want to delete: ");
@@ -153,25 +153,49 @@ public class SystemInterface
     }
 
     void createJourney() {
+        int executionCount = 0;
+        String transportMode;
+        int startOfJourney, endOfJourney;
         clearScreen();
         input.nextLine(); // Consume newline character
-        System.out.println("Creating a new Journey:");
+        System.out.println("============================Creating a new Journey============================");
 
         // Prompt user for journey details
         System.out.print("Enter Journey ID: ");
         int journeyID = input.nextInt();
 
         input.nextLine(); // Consume newline character
+
+
+
+        do {
+        if(executionCount > 0) System.out.print("Please enter only one of the provided responses."); // If this isnt the first time executing this code, send an error to user.
         System.out.print("Enter Transport Mode (train/bus/tram): ");
-        String transportMode = input.nextLine();
+        transportMode = input.nextLine().toUpperCase().trim(); // Make response uppercase for consistency, and trim any spaces before or after text. I.e. "  train" --> "TRAIN"
+        executionCount++;
+        } while (!transportMode.equals("train") // If response does not match TRAIN
+                && !transportMode.equals("bus") // or BUS
+                && !transportMode.equals("tram")); // or TRAM, repeat question and ask for input until user inputs correctly
+
+
 
         System.out.print("Enter Start of Journey (1-10): ");
-        int startOfJourney = input.nextInt();
+        startOfJourney = input.nextInt();
+        do {
+            if(executionCount > 0) System.out.print("Please enter only a number between 1 and 10"); // If this isnt the first time executing this code, send an error to user.
+            System.out.print("Enter End of Journey (1-10, different from start): ");
+            endOfJourney = input.nextInt();
+            executionCount++;
+        } while (endOfJourney < 1 || endOfJourney > 10); // If user input is not within defined ranges ask question again.
+        executionCount = 0;
+        /* Oi sam ya dog, the end of the journey needs to be
+         * a further stop than the start journey right? Like
+         * I should check if the endOfJourney is larger than 
+         * startOfJourney and throw and error if it isnt?
+         */
 
-        System.out.print("Enter End of Journey (1-10, different from start): ");
-        int endOfJourney = input.nextInt();
 
-        System.out.print("Enter Distance of Journey: ");
+        System.out.print("Enter Distance of Journey: "); // What the flip do we do here gang
         int distanceOfJourney = input.nextInt();
 
         // Create the journey object
@@ -185,7 +209,6 @@ public class SystemInterface
     }
 
 
-    }
     public static void main(String[] args)
     {
         SystemInterface systemUI = new SystemInterface();
