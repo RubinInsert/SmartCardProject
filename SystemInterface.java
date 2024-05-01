@@ -1,6 +1,6 @@
 import java.util.Scanner;
 import java.util.concurrent.ThreadLocalRandom;
-
+import java.util.concurrent.TimeUnit;
 
 /* DONE:
  * - Main Screen
@@ -23,7 +23,7 @@ public class SystemInterface
     static SmartCard smartCard3;
     private void run()
     {
-        clearScreen();
+        ConsoleUtil.clearScreen();
         displayMainScreen();
         //This method should control the flow of the program
     }
@@ -70,18 +70,15 @@ public class SystemInterface
             case 8: // Total Fare Costs
                 break;
             default:
-            System.out.println("Page Number Invalid!");
+            ConsoleUtil.showError("Page Number Invalid!");
                 break;
         }
-    }
-    static void clearScreen() { // Creates a lot of new lines to clear the window -> Not system specific unlike "cls" for windows.
-        System.out.println("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n");
     }
     void createSmartCard() {
         if(smartCard1 == null || smartCard2 == null || smartCard3 == null) { // If there is an empty card slot available 
             char type = ' ';
             double balance;
-            clearScreen();
+            ConsoleUtil.clearScreen();
             System.out.println("What Type of Card are you creating?");
             System.out.println("1. Child");
             System.out.println("2. Senior");
@@ -99,7 +96,8 @@ public class SystemInterface
                     type = 'A';
                     break;
                 default:
-                    showError("The number you inputted was out of the range of the menu!");
+                    ConsoleUtil.showError("The number you inputted was out of the range of the menu!");
+                    displayMainScreen();
                     return;
             }
             System.out.println("Enter the balance you wish to load onto the card: "); // TODO: Add input checks e.g. if user inputs negative number, or some bs.
@@ -111,21 +109,15 @@ public class SystemInterface
             displayMainScreen();
             
         } else { // There is no empty card slot
-            showError("You have reached max number of cards. You cannot create a new card until you delete one!");
+            ConsoleUtil.showError("You have reached max number of cards. You cannot create a new card until you delete one!");
+            displayMainScreen();
         }
-    }
-    void showError(String errorMessage) {
-        clearScreen();
-        System.out.println("==============================Error==============================");
-        System.out.println(errorMessage);
-        displayMainScreen();
-
     }
 
 
 
     void deleteSmartCard() {
-        clearScreen();
+        ConsoleUtil.clearScreen();
         System.out.print("Enter the Smart Card ID you want to delete: ");
         int idToDelete = input.nextInt();
         if (smartCard1 != null && smartCard1.getSmartCardID() == idToDelete) {
@@ -138,17 +130,20 @@ public class SystemInterface
             smartCard3 = null;
             System.out.println("Smart Card with ID " + idToDelete + " has been deleted.");
         } else {
-            showError("Smart Card with ID " + idToDelete + " not found.");
+            ConsoleUtil.showError("Smart Card with ID " + idToDelete + " not found.");
         }
         displayMainScreen();
     }
 
     void createJourney() {
-        if(SmartCardUtil.isAnySmartCardsCreated() == false) showError("A SmartCard must be created prior to creating a Journey!"); // If there are no smartcards active, dont allow user to create a journey
+        if(SmartCardUtil.isAnySmartCardsCreated() == false) {
+            ConsoleUtil.showError("A SmartCard must be created prior to creating a Journey!"); // If there are no smartcards active, dont allow user to create a journey
+            displayMainScreen();
+        }
         int executionCount = 0;
         String transportMode;
         int startOfJourney, endOfJourney;
-        clearScreen();
+        ConsoleUtil.clearScreen();
         input.nextLine(); // Consume newline character
         System.out.println("============================Creating a new Journey============================");
 
@@ -156,29 +151,29 @@ public class SystemInterface
         System.out.print("Enter Journey ID: ");
         int journeyID = input.nextInt();
 
-        input.nextLine(); // Consume newline character
+        //input.nextLine(); // Consume newline character
 
 
 
         do {
-        if(executionCount > 0) System.out.println("Please enter only one of the provided responses."); // If this isnt the first time executing this code, send an error to user.
+        if(executionCount > 0) ConsoleUtil.showError("Please enter only one of the provided responses."); // If this isnt the first time executing this code, send an error to user.
         System.out.print("Enter Transport Mode (train/bus/tram): ");
-        transportMode = input.nextLine().toUpperCase().trim(); // Make response uppercase for consistency, and trim any spaces before or after text. I.e. "  train" --> "TRAIN"
+        transportMode = input.next().toUpperCase().trim(); // Make response uppercase for consistency, and trim any spaces before or after text. I.e. "  train" --> "TRAIN"
         executionCount++;
         } while (!transportMode.equals("TRAIN") // If response does not match TRAIN
                 && !transportMode.equals("BUS") // or BUS
                 && !transportMode.equals("TRAM")); // or TRAM, repeat question and ask for input until user inputs correctly
-
+        executionCount = 0;
 
         do {
-            if(executionCount > 0) System.out.println("Please enter only a number between 1 and 10"); // If this isnt the first time executing this code, send an error to user.
+            if(executionCount > 0) ConsoleUtil.showError("Please enter only a number between 1 and 10"); // If this isnt the first time executing this code, send an error to user.
             System.out.print("Enter Start of Journey (1-10): ");
             startOfJourney = input.nextInt();
             executionCount++;
         } while (startOfJourney < 1 || startOfJourney > 10);
 
         do {
-            if(executionCount > 0) System.out.println("Please enter only a number between 1 and 10"); // If this isnt the first time executing this code, send an error to user.
+            if(executionCount > 0) ConsoleUtil.showError("Please enter only a number between 1 and 10"); // If this isnt the first time executing this code, send an error to user.
             System.out.print("Enter End of Journey (1-10, different from start): ");
             endOfJourney = input.nextInt();
             executionCount++;
@@ -207,7 +202,7 @@ public class SystemInterface
             System.out.println(menuNumberTracker + ". ID: " + SmartCardUtil.getSmartCard(x).getSmartCardID() + " || Card Type: " + SmartCardUtil.getSmartCard(x).getType()); 
         }
         do {
-            if(executionCount > 0) System.out.println("Please enter a valid menu number (Between 1-" + menuNumberTracker + ")");
+            if(executionCount > 0) ConsoleUtil.showError("Please enter a valid menu number (Between 1-" + menuNumberTracker + ")");
             System.out.print("Enter Menu Number: ");
             chosenCardMenuNumber = input.nextInt();
             executionCount++;
@@ -272,10 +267,11 @@ public class SystemInterface
     
         }
         static void listAllSmartCards() {
-            clearScreen();
+            ConsoleUtil.clearScreen();
             printSmartCard(smartCard1);
             printSmartCard(smartCard2);
             printSmartCard(smartCard3);
+            ConsoleUtil.waitForKeyPress();
         }
         static void sortSmartCards(SmartCard sc) { // Place the new smartcard in the earliest available slot
             if(smartCard1 == null) { 
@@ -291,7 +287,27 @@ public class SystemInterface
             return true;
         }
     }
+    public static class ConsoleUtil {
+        public static void waitForKeyPress() { // Wait for user to press Enter Key before proceeding with code execution.
+            System.out.println("<Press Enter to Continue>");
+            try{
+                System.in.read();
+            }catch(Exception e){}
+            
+        }
+        public static void clearScreen() { // Creates a lot of new lines to clear the window -> Not system specific unlike "cls" for windows.
+        System.out.println(System.lineSeparator().repeat(100));
+        }
+        public static void showError(String errorMessage) {
+            ConsoleUtil.clearScreen();
+            System.out.println("==============================Error==============================");
+            System.out.println(errorMessage);
+            System.out.println("=================================================================");
+            ConsoleUtil.waitForKeyPress();
+            ConsoleUtil.clearScreen();
+        }
     
+    }
 
     public static void main(String[] args)
     {
