@@ -1,22 +1,52 @@
-public class Journey
-{
-    private int journeyID;                 // the id of the journey
-    private String transportMode;          // the public transport mode of the journey (can be only “train”, “bus” or “tram”) 
-    private int startOfJourney;            // the starting point of the journey. It can be only a number between [1..10] 
-    private int endOfJourney;              // the ending point of the journey. It can be only a number between [1..10] (should be different from the starting point of the journey)
-    private int distanceOfJourney;         // the distance of the journey (i.e. the difference in number of stations/stops travelled between startOfJourney and endOfJourney)
-    public Journey() {
+public class Journey {
+    private int journeyID;
+    private String transportMode;
+    private int startOfJourney;
+    private int endOfJourney;
+    private int distanceOfJourney;
 
-    }
-    // add comments
-    public void setTransportMode(String transportMode)
-    {
+    public Journey(int journeyID, String transportMode, int startOfJourney, int endOfJourney, int distanceOfJourney) {
+        this.journeyID = journeyID;
         this.transportMode = transportMode;
+        this.startOfJourney = startOfJourney;
+        this.endOfJourney = endOfJourney;
+        this.distanceOfJourney = distanceOfJourney;
     }
-    // add comments
-    public String getTransportMode()
-    {
+
+    // Getters and Setters
+    public int getJourneyID() {
+        return journeyID;
+    }
+
+    public String getTransportMode() {
         return transportMode;
     }
-    // complete all other methods from here.
+
+    public void setTransportMode(String transportMode) {
+        this.transportMode = transportMode;
+    }
+
+    public int getStartOfJourney() {
+        return startOfJourney;
+    }
+
+    public void setStartOfJourney(int startOfJourney) {
+        this.startOfJourney = startOfJourney;
+    }
+
+    public int getEndOfJourney() {
+        return endOfJourney;
+    }
+
+    public void setEndOfJourney(int endOfJourney) {
+        this.endOfJourney = endOfJourney;
+    }
+
+    public int getDistanceOfJourney() {
+        return distanceOfJourney;
+    }
+
+    public void setDistanceOfJourney(int distanceOfJourney) {
+        this.distanceOfJourney = distanceOfJourney;
+    }
 }
