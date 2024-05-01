@@ -96,6 +96,13 @@ public class SmartCard {
         }
         return false;
     }
+    public int getJourneyCount() { // returns number of journeys on the card
+        int count = 0;
+        if(journey1 != null) count++;
+        if(journey2 != null) count++;
+        if(journey3 != null) count++;
+        return count;
+    }
     public void addJourney(Journey j) {
         reorganiseJourneys();
         if(journey1 == null) journey1 = j;
@@ -109,6 +116,19 @@ public class SmartCard {
         }
         if(journey2 == null) {
             journey2 = journey3;
+        }
+    }
+    Journey getJourney(int index) {
+        reorganiseJourneys();
+        switch (index) {
+            case 0: 
+                return journey1;
+            case 1:
+                return journey2;
+            case 2:
+                return journey3;
+            default:
+            return null;
         }
     }
     /**

@@ -132,6 +132,8 @@ public class SystemInterface
         } else {
             ConsoleUtil.showError("Smart Card with ID " + idToDelete + " not found.");
         }
+        ConsoleUtil.waitForKeyPress();
+        ConsoleUtil.clearScreen();
         displayMainScreen();
     }
 
@@ -171,7 +173,7 @@ public class SystemInterface
             startOfJourney = input.nextInt();
             executionCount++;
         } while (startOfJourney < 1 || startOfJourney > 10);
-
+        executionCount = 0;
         do {
             if(executionCount > 0) ConsoleUtil.showError("Please enter only a number between 1 and 10"); // If this isnt the first time executing this code, send an error to user.
             System.out.print("Enter End of Journey (1-10, different from start): ");
@@ -205,19 +207,20 @@ public class SystemInterface
             if(executionCount > 0) ConsoleUtil.showError("Please enter a valid menu number (Between 1-" + menuNumberTracker + ")");
             System.out.print("Enter Menu Number: ");
             chosenCardMenuNumber = input.nextInt();
+            ConsoleUtil.clearScreen();
             executionCount++;
         } while (chosenCardMenuNumber < 1 || chosenCardMenuNumber > SmartCardUtil.getAvailableSmartCardCount());
         int y=0;
         for(int x = 0; x < SmartCardUtil.getSmartCardCount(); x++) { // Loop through again to find the card which corresponds with the menu number provided by the user
             if(SmartCardUtil.getSmartCard(x).hasReachedMaxJourneys()) continue; // Skip cards with no journeys available, just like the menu.
             y++;
-            if(y == menuNumberTracker) {
+            if(y == chosenCardMenuNumber) {
                 SmartCardUtil.getSmartCard(x).addJourney(newJourney); // Add the journey to the corresponding card.
                 System.out.println("Journey created successfully in Smart Card ID: " + SmartCardUtil.getSmartCard(x).getSmartCardID());
             }
         }
         
-
+        ConsoleUtil.waitForKeyPress();
         displayMainScreen();
     }
     public static class SmartCardUtil { // Access functions by prefixing with SmartCardHelperFunctions..... SmartCardUtil.getSmartCard(3);
@@ -259,11 +262,12 @@ public class SystemInterface
         }
         static void printSmartCard(SmartCard sc) {
             if(sc == null) return;
-            System.out.println("============================SMART CARD===========================");
-            System.out.println("SmartID: " + sc.getSmartCardID());
-            System.out.println("Type: " + sc.getType());
-            System.out.println("Card Balance: " + sc.getBalance());
-            System.out.println("=================================================================");
+            System.out.println("Smartcard " + sc.getSmartCardID() + " has type " + sc.getType() + " and " + sc.getJourneyCount() + " journey(s)");
+            for(int x=0; x < sc.getJourneyCount(); x++) {
+                if(sc.getJourney(x) != null) JourneyUtil.printJourneyTruncated(sc.getJourney(x));
+                
+            }
+
     
         }
         static void listAllSmartCards() {
@@ -285,6 +289,16 @@ public class SystemInterface
         static boolean isAnySmartCardsCreated() {
             if(smartCard1 == null && smartCard2 == null && smartCard3 == null) return false;
             return true;
+        }
+    }
+    public static class JourneyUtil {
+        static void printJourneyTruncated(Journey j) {
+            if(j == null) return;
+            System.out.println("    Journey " + j.getJourneyID() + " has transport mode " + j.getTransportMode());
+        }
+        static void printJourney(Journey j) {
+            if(j == null) return;
+            System.out.println("Journey " + j.getJourneyID() + " has transport mode " + j.getTransportMode() + " starting from " + j.getStartOfJourney() + " and ending at " + j.getEndOfJourney() + " with journey distance of " + j.getDistanceOfJourney() + " station(s) / stop(s)");
         }
     }
     public static class ConsoleUtil {
