@@ -65,12 +65,14 @@ public class SystemInterface
                 deleteSmartCard();
                 break;
             case 4: // Delete a Journey
+                deleteJourney();
                 break;
             case 5: // List Smart Cards
                 smartCardUtil.listAllSmartCards();
                 displayMainScreen();
                 break;
             case 6: // List Journeys on Smart Card
+                listJourneysWithTransportMode();
                 break;
             case 7: // List Transport specific Journeys
                 break;
@@ -250,7 +252,7 @@ public class SystemInterface
         }
         do {
             if(executionCount > 0) consoleUtil.showError("Please enter a valid menu number (Between 1-" + menuNumberTracker + ")");
-            System.out.print("Enter Menu Number: ");
+            System.out.print(": ");
             chosenCardMenuNumber = input.nextInt();
             consoleUtil.clearScreen();
             executionCount++;
@@ -411,7 +413,6 @@ public class SystemInterface
             }
         }
     }
-
         double calculateFare(String transportMode, char cardType, int distanceOfJourney) {
         double baseFare = 1.5; // Base fare for all types of smart cards
         double farePerDistance;
@@ -428,11 +429,73 @@ public class SystemInterface
             default:
                 farePerDistance = 0;
         }
-
         double totalFare = baseFare + farePerDistance * distanceOfJourney;
+        totalFare = Math.round(totalFare * 100.0) / 100.0;
         return totalFare;
+        
     }
 
+    void deleteJourney() {
+        consoleUtil.clearScreen();
+        System.out.print("Enter the Smart Card ID: ");
+        int cardID = input.nextInt();
+        System.out.print("Enter the Journey ID you want to delete: ");
+        int journeyID = input.nextInt();
+
+        SmartCard smartCard = findSmartCardByID(cardID);
+        if (smartCard != null) {
+            smartCard.deleteJourney(journeyID);
+        } else {
+            consoleUtil.showError("Smart Card with ID " + cardID + " not found.");
+        }
+        consoleUtil.waitForKeyPress(); 
+        consoleUtil.clearScreen();
+        displayMainScreen();
+    }
+
+    SmartCard findSmartCardByID(int cardID) {
+        if (smartCard1 != null && smartCard1.getSmartCardID() == cardID) {
+            return smartCard1;
+        } else if (smartCard2 != null && smartCard2.getSmartCardID() == cardID) {
+            return smartCard2;
+        } else if (smartCard3 != null && smartCard3.getSmartCardID() == cardID) {
+            return smartCard3;
+        }
+        return null;
+    }
+
+
+    void listJourneysWithTransportMode() {
+        consoleUtil.clearScreen();
+        System.out.print("Enter the transport mode: ");
+        String transportMode = input.next().trim().toUpperCase(); // Convert input to uppercase for consistency
+
+        boolean foundJourney = false;
+
+        // Iterate through all smartcards and their journeys
+        for (int i = 0; i < smartCardUtil.getSmartCardCount(); i++) {
+            SmartCard currentCard = smartCardUtil.getSmartCard(i);
+            if (currentCard != null) {
+                for (int j = 0; j < currentCard.getJourneyCount(); j++) {
+                    Journey journey = currentCard.getJourney(j);
+                    if (journey != null && journey.getTransportMode().equals(transportMode)) {
+                        System.out.println("Journey " + journey.getJourneyID() + " has transport mode " + transportMode +
+                                ", and it belongs to smartcard " + currentCard.getSmartCardID());
+                        foundJourney = true;
+                    }
+                }
+            }
+        }
+
+        // If no journeys match the specified transport mode, display a message
+        if (!foundJourney) {
+            System.out.println("No journeys with that transport mode.");
+        }
+
+        consoleUtil.waitForKeyPress();
+        consoleUtil.clearScreen();
+        displayMainScreen();
+    }
 
     public static void main(String[] args)
     {
