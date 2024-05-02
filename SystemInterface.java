@@ -9,11 +9,15 @@ import java.util.Scanner;
  * - Delete Smart Card Screen
  * - List Smart Cards Screen
  * - Make so they cant load less than $5.00 on a Smartcard
- * TODO:
  * - Delete a Journey
  * - List the Journeys on a Smart Card
  * - List of Journeys with a particular transport mode and which smartcard they belong to
  * - Summary of total cost/fare for all transportation modes journeys made by all Smartcards registered in the system.
+ * TODO:
+ * - Dont allow ID's to be less than zero (Journey, Smartcard)
+ * - Calculate the distance of journey instead of asking user (should be the absolute value of the difference between the start and end of journey)
+ * - Error is thrown when a non-int is given for a "Start of Journey" and "End of Journey", and i suspect many other integer inputs
+ * - 
  */
 public class SystemInterface
 {
@@ -39,8 +43,8 @@ public class SystemInterface
         System.out.println("3. Delete a Smart Card");
         System.out.println("4. Delete a Journey");
         System.out.println("5. List Smart Cards");
-        System.out.println("6. List Journeys on Smart Card");
-        System.out.println("7. List Transport specific Journeys");
+        System.out.println("6. List Transport specific Journeys");
+        System.out.println("7. List Journeys on Smart Card");
         System.out.println("8. Total Fare Costs");
         System.out.println("=================================================================");
         System.out.print("Input Menu Number: ");
@@ -73,6 +77,7 @@ public class SystemInterface
                 listJourneysWithTransportMode();
                 break;
             case 7: // List Transport specific Journeys
+                listJourneysOnSmartCard();
                 break;
             case 8: // Total Fare Costs
                 calculateAndDisplayFareCosts();
@@ -239,7 +244,7 @@ public class SystemInterface
         // Create the journey object
         Journey newJourney = new Journey(journeyID, transportMode, startOfJourney, endOfJourney, distanceOfJourney);
 
-        // Add the journey to a smart card (not implemented yet)
+        // Add the journey to a smart card
         System.out.println("Which Smart Card would you like to add this journey to?");
         int chosenCardMenuNumber;
         int menuNumberTracker = 0; // Incase a card must be removed from the list, this number keeps track of the menu number so it doesnt skip a number.
@@ -250,7 +255,7 @@ public class SystemInterface
         }
         do {
             if(executionCount > 0) consoleUtil.showError("Please enter a valid menu number (Between 1-" + menuNumberTracker + ")");
-            System.out.print(": ");
+            System.out.print("Enter a menu number: ");
             chosenCardMenuNumber = input.nextInt();
             consoleUtil.clearScreen();
             executionCount++;
@@ -427,7 +432,6 @@ public class SystemInterface
             consoleUtil.showError("Smart Card with ID " + cardID + " not found.");
         }
         consoleUtil.waitForKeyPress(); 
-        consoleUtil.clearScreen();
         displayMainScreen();
     }
 
@@ -474,7 +478,35 @@ public class SystemInterface
         consoleUtil.clearScreen();
         displayMainScreen();
     }
-
+    void listJourneysOnSmartCard() {
+        int executionCount = 0;
+        System.out.println("Which Smart Card would you like to list Journeys from? ");
+        int chosenCardMenuNumber;
+        for(int x = 0; x < smartCardUtil.getSmartCardCount(); x++) {
+            System.out.println((x+1) + ". ID: " + smartCardUtil.getSmartCard(x).getSmartCardID() + " || Card Type: " + smartCardUtil.getSmartCard(x).getType()); 
+        }
+        do {
+            if(executionCount > 0) consoleUtil.showError("Please enter a valid menu number (Between 1-" + smartCardUtil.getSmartCardCount() + ")");
+            System.out.print("Enter a menu number: ");
+            chosenCardMenuNumber = input.nextInt();
+            consoleUtil.clearScreen();
+            executionCount++;
+        } while (chosenCardMenuNumber < 1 || chosenCardMenuNumber > smartCardUtil.getSmartCardCount());
+        for(int x = 0; x < smartCardUtil.getSmartCardCount(); x++) { // Loop through again to find the card which corresponds with the menu number provided by the user
+            if((x+1) == chosenCardMenuNumber) {
+                SmartCard chosenSmartCard = smartCardUtil.getSmartCard(x);
+                if(chosenSmartCard.getJourneyCount() == 0) {
+                    consoleUtil.showError("The selected card has no Journeys!");
+                    displayMainScreen();
+                }
+                for(int j = 0; j < chosenSmartCard.getJourneyCount(); j++) {
+                    chosenSmartCard.getJourney(j).print();
+                }
+                consoleUtil.waitForKeyPress();
+                displayMainScreen();
+            }
+        }
+    }
     public static void main(String[] args)
     {
         SystemInterface systemUI = new SystemInterface();
