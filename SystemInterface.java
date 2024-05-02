@@ -350,9 +350,8 @@ public class SystemInterface
     public class ConsoleUtil {
         public void waitForKeyPress() { // Wait for user to press Enter Key before proceeding with code execution.
             System.out.println("<Press Enter to Continue>");
-            try{
-                System.in.read();
-            }catch(Exception e){}
+            input.nextLine(); // Consume first line.
+            input.nextLine();
             
         }
         public void clearScreen() { // Creates a lot of new lines to clear the window -> Not system specific unlike "cls" for windows.
