@@ -49,4 +49,10 @@ public class Journey {
     public void setDistanceOfJourney(int distanceOfJourney) {
         this.distanceOfJourney = distanceOfJourney;
     }
+    void printTruncated() {
+        System.out.println("    Journey " + this.getJourneyID() + " has transport mode " + this.getTransportMode());
+    }
+    void print() {
+        System.out.println("Journey " + this.getJourneyID() + " has transport mode " + this.getTransportMode() + " starting from " + this.getStartOfJourney() + " and ending at " + this.getEndOfJourney() + " with journey distance of " + this.getDistanceOfJourney() + " station(s) / stop(s)");
+    }
 }

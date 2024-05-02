@@ -23,13 +23,11 @@ public class SystemInterface
     SmartCard smartCard3;
     ConsoleUtil consoleUtil; // Cant use static objects, have to make do with this :(
     SmartCardUtil smartCardUtil;
-    JourneyUtil journeyUtil;
     private void run()
     {
         input = new Scanner(System.in);
         consoleUtil = new ConsoleUtil();
         smartCardUtil = new SmartCardUtil();
-        journeyUtil = new JourneyUtil();
         consoleUtil.clearScreen();
         displayMainScreen();
         //This method should control the flow of the program
@@ -287,8 +285,8 @@ public class SystemInterface
             switch (index) {
                 case 0: 
                 if(smartCard1 != null) return smartCard1;
-                if(smartCard2 != null) return smartCard1;
-                if(smartCard3 != null) return smartCard1;
+                if(smartCard2 != null) return smartCard2;
+                if(smartCard3 != null) return smartCard3;
                 break;
                 case 1:
                 if (smartCard1 != null) {
@@ -305,21 +303,11 @@ public class SystemInterface
             }
             return null;
         }
-        void printSmartCard(SmartCard sc) {
-            if(sc == null) return;
-            System.out.println("Smartcard " + sc.getSmartCardID() + " has type " + sc.getTypeFormatted() + " and " + sc.getJourneyCount() + " journey(s)");
-            for(int x=0; x < sc.getJourneyCount(); x++) {
-                if(sc.getJourney(x) != null) journeyUtil.printJourneyTruncated(sc.getJourney(x));
-                
-            }
-
-    
-        }
         void listAllSmartCards() {
             consoleUtil.clearScreen();
-            printSmartCard(smartCard1);
-            printSmartCard(smartCard2);
-            printSmartCard(smartCard3);
+            smartCard1.print();
+            smartCard2.print();
+            smartCard3.print();
             consoleUtil.waitForKeyPress();
         }
         void sortSmartCard(SmartCard sc) { // Place the new smartcard in the earliest available slot
@@ -334,16 +322,6 @@ public class SystemInterface
         boolean isAnySmartCardsCreated() {
             if(smartCard1 == null && smartCard2 == null && smartCard3 == null) return false;
             return true;
-        }
-    }
-    public class JourneyUtil {
-        void printJourneyTruncated(Journey j) {
-            if(j == null) return;
-            System.out.println("    Journey " + j.getJourneyID() + " has transport mode " + j.getTransportMode());
-        }
-        void printJourney(Journey j) {
-            if(j == null) return;
-            System.out.println("Journey " + j.getJourneyID() + " has transport mode " + j.getTransportMode() + " starting from " + j.getStartOfJourney() + " and ending at " + j.getEndOfJourney() + " with journey distance of " + j.getDistanceOfJourney() + " station(s) / stop(s)");
         }
     }
     public class ConsoleUtil {

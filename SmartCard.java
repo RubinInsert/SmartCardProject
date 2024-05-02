@@ -142,6 +142,13 @@ public class SmartCard {
             return null;
         }
     }
+    void print() {
+        System.out.println("Smartcard " + this.getSmartCardID() + " has type " + this.getTypeFormatted() + " and " + this.getJourneyCount() + " journey(s)");
+        for(int x=0; x < this.getJourneyCount(); x++) {
+            if(this.getJourney(x) != null) this.getJourney(x).printTruncated();
+            
+        }
+    }
     /**
      * Checks if the given card type is valid ("C", "A", or "S").
      * @param type The card type to check.
