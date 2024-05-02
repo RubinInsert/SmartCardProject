@@ -14,6 +14,7 @@ import java.util.Scanner;
  * - List of Journeys with a particular transport mode and which smartcard they belong to
  * - Summary of total cost/fare for all transportation modes journeys made by all Smartcards registered in the system.
  * - Make so they cant load less than $5.00 on a Smartcard
+ * - Move some logic to other class files
  */
 public class SystemInterface
 {
@@ -145,9 +146,8 @@ public class SystemInterface
             You need to let the user enter the IDs manually for both smartcards and journeys,
             and you are not allowed to generate/assign IDs randomly or automatically. */
 
-            SmartCard newTempCard = new SmartCard(cardID, type, balance);
             System.out.println("SmartCard created under ID: " + cardID);
-            smartCardUtil.sortSmartCard(newTempCard);
+            smartCardUtil.sortSmartCard(new SmartCard(cardID, type, balance););
             consoleUtil.waitForKeyPress(); 
             consoleUtil.clearScreen();
             displayMainScreen();
