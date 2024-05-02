@@ -146,7 +146,25 @@ public class SmartCard {
         System.out.println("Smartcard " + this.getSmartCardID() + " has type " + this.getTypeFormatted() + " and " + this.getJourneyCount() + " journey(s)");
         for(int x=0; x < this.getJourneyCount(); x++) {
             if(this.getJourney(x) != null) this.getJourney(x).printTruncated();
-            
+        }
+    } 
+
+    
+    // Method to delete a journey by its ID (KEEP THIS MEthod)
+    
+    public void deleteJourney(int journeyID) {
+        // Check if the journeyID matches any existing journey and delete it
+        if (journey1 != null && journey1.getJourneyID() == journeyID) {
+            journey1 = null;
+            System.out.println("Journey with ID " + journeyID + " has been deleted.");
+        } else if ((type == 'A' || type == 'S') && journey2 != null && journey2.getJourneyID() == journeyID) {
+            journey2 = null;
+            System.out.println("Journey with ID " + journeyID + " has been deleted.");
+        } else if (type == 'S' && journey3 != null && journey3.getJourneyID() == journeyID) {
+            journey3 = null;
+            System.out.println("Journey with ID " + journeyID + " has been deleted.");
+        } else {
+            System.out.println("Journey with ID " + journeyID + " not found or cannot be deleted.");
         }
     }
     /**
@@ -156,5 +174,7 @@ public class SmartCard {
      */
     public boolean isValidType(char type) {
         return type == 'C' || type == 'A' || type == 'S';
+
+
     }
 }
