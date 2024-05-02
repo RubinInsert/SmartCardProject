@@ -1,6 +1,6 @@
 import java.util.Scanner;
-import java.util.concurrent.ThreadLocalRandom;
-import java.util.concurrent.TimeUnit;
+//import java.util.concurrent.ThreadLocalRandom;
+//import java.util.concurrent.TimeUnit;
 
 /* DONE:
  * - Main Screen
@@ -13,6 +13,7 @@ import java.util.concurrent.TimeUnit;
  * - List the Journeys on a Smart Card
  * - List of Journeys with a particular transport mode and which smartcard they belong to
  * - Summary of total cost/fare for all transportation modes journeys made by all Smartcards registered in the system.
+ * - Make so they cant load less than $5.00 on a Smartcard
  */
 public class SystemInterface
 {
@@ -83,14 +84,14 @@ public class SystemInterface
     void createSmartCard() {
         if(smartCardUtil.getSmartCardCount() < 3) { // If there is an empty card slot available 
             char type = ' ';
-            double balance;
+            double balance = 0;
             consoleUtil.clearScreen();
             int cardID;
             int executionCount = 0;
             do {
                 if(executionCount > 0) consoleUtil.showError("Please enter an ID Number greater than zero and is not currently being used by existing Smart Cards.");
                 executionCount++;
-                System.out.print("Enter a Card ID Number: ");
+                System.out.print("Enter a number for the Card ID (greater than zero): ");
                 cardID = input.nextInt();
                 for(int x = 0; x < smartCardUtil.getSmartCardCount(); x++) { // Loop over existing cards
                     if(cardID == smartCardUtil.getSmartCard(x).getSmartCardID()) { // Check if the new ID given by user matches any existing cards and throw error if a match is found.
@@ -99,7 +100,8 @@ public class SystemInterface
                 }
             } while (cardID < 0);
             executionCount = 0;
-            
+          
+            consoleUtil.clearScreen();
             System.out.println("What Type of Card are you creating?");
             System.out.println("1. Child");
             System.out.println("2. Senior");
@@ -121,9 +123,19 @@ public class SystemInterface
                     displayMainScreen();
                     return;
             }
-            System.out.println("Enter the balance you wish to load onto the card: "); // TODO: Add input checks e.g. if user inputs negative number, or some bs.
-            balance = input.nextDouble();
-            SmartCard newTempCard = new SmartCard(cardID, type, balance);
+            boolean check = false;
+            while (!check) {
+                consoleUtil.clearScreen();
+                System.out.println("Enter the balance you wish to load onto the card: ");
+                balance = input.nextDouble();
+                if (balance < 5) {
+                    consoleUtil.clearScreen();
+                    consoleUtil.showError("The balance you entered is too low, please enter a balance greater than 5.");
+                } else {
+                    check = true;
+                }
+}
+    
 
             /*Can we write code that assigns IDs rather than allowing input by the user to
             avoid them having the ability to duplicate IDs? Or do we have to write the code
@@ -133,10 +145,13 @@ public class SystemInterface
             You need to let the user enter the IDs manually for both smartcards and journeys,
             and you are not allowed to generate/assign IDs randomly or automatically. */
 
-
+            SmartCard newTempCard = new SmartCard(cardID, type, balance);
             System.out.println("SmartCard created under ID: " + cardID);
             smartCardUtil.sortSmartCard(newTempCard);
+            consoleUtil.waitForKeyPress(); 
+            consoleUtil.clearScreen();
             displayMainScreen();
+            
             
         } else { // There is no empty card slot
             consoleUtil.showError("You have reached max number of cards. You cannot create a new card until you delete one!");
@@ -162,7 +177,7 @@ public class SystemInterface
         } else {
             consoleUtil.showError("Smart Card with ID " + idToDelete + " not found.");
         }
-        consoleUtil.waitForKeyPress();
+        consoleUtil.waitForKeyPress(); 
         consoleUtil.clearScreen();
         displayMainScreen();
     }
