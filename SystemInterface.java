@@ -147,7 +147,7 @@ public class SystemInterface
             and you are not allowed to generate/assign IDs randomly or automatically. */
 
             System.out.println("SmartCard created under ID: " + cardID);
-            smartCardUtil.sortSmartCard(new SmartCard(cardID, type, balance););
+            smartCardUtil.sortSmartCard(new SmartCard(cardID, type, balance));
             consoleUtil.waitForKeyPress(); 
             consoleUtil.clearScreen();
             displayMainScreen();
