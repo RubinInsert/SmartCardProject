@@ -8,12 +8,12 @@ import java.util.Scanner;
  * - Create Journey Screen
  * - Delete Smart Card Screen
  * - List Smart Cards Screen
+ * - Make so they cant load less than $5.00 on a Smartcard
  * TODO:
  * - Delete a Journey
  * - List the Journeys on a Smart Card
  * - List of Journeys with a particular transport mode and which smartcard they belong to
  * - Summary of total cost/fare for all transportation modes journeys made by all Smartcards registered in the system.
- * - Make so they cant load less than $5.00 on a Smartcard
  */
 public class SystemInterface
 {
@@ -75,6 +75,7 @@ public class SystemInterface
             case 7: // List Transport specific Journeys
                 break;
             case 8: // Total Fare Costs
+                calculateAndDisplayFareCosts();
                 break;
             default:
             consoleUtil.showError("Page Number Invalid!");
@@ -367,6 +368,73 @@ public class SystemInterface
         }
     
     }
+
+    
+
+    void calculateAndDisplayFareCosts() {
+        double totalFare = 0;
+        System.out.println("Total transport mode journeys cost/fare:");
+        System.out.println("---------------------------------------------------------");
+
+        // Calculate total fare for all journeys
+        for (int i = 0; i < smartCardUtil.getSmartCardCount(); i++) {
+            SmartCard currentCard = smartCardUtil.getSmartCard(i);
+            if (currentCard != null) {
+                for (int j = 0; j < currentCard.getJourneyCount(); j++) {
+                    Journey journey = currentCard.getJourney(j);
+                    if (journey != null) {
+                        double fare = calculateFare(journey.getTransportMode(), currentCard.getType(), journey.getDistanceOfJourney());
+                        totalFare += fare;
+                        System.out.println("Total cost of " + journey.getTransportMode() + " journeys is $" + fare);
+                    }
+                }
+            }
+        }
+
+        // Display total fare
+        System.out.println("---------------------------------------------------------");
+        System.out.println("Total Fare: $" + totalFare);
+
+        // Breakdown by smart card
+        System.out.println("Breakdown by smartcard:");
+        System.out.println("---------------------------------------------------------");
+        for (int i = 0; i < smartCardUtil.getSmartCardCount(); i++) {
+            SmartCard currentCard = smartCardUtil.getSmartCard(i);
+            if (currentCard != null) {
+                double cardFare = 0;
+                for (int j = 0; j < currentCard.getJourneyCount(); j++) {
+                    Journey journey = currentCard.getJourney(j);
+                    if (journey != null) {
+                        cardFare += calculateFare(journey.getTransportMode(), currentCard.getType(), journey.getDistanceOfJourney());
+                    }
+                }
+                System.out.println("SmartCard " + currentCard.getSmartCardID() + ":");
+                System.out.println("Total fare: $" + cardFare);
+            }
+        }
+    }
+
+        double calculateFare(String transportMode, char cardType, int distanceOfJourney) {
+        double baseFare = 1.5; // Base fare for all types of smart cards
+        double farePerDistance;
+        switch (Character.toUpperCase(cardType)) {
+            case 'C':
+                farePerDistance = 1.86;
+                break;
+            case 'A':
+                farePerDistance = 2.24;
+                break;
+            case 'S':
+                farePerDistance = 1.60;
+                break;
+            default:
+                farePerDistance = 0;
+        }
+
+        double totalFare = baseFare + farePerDistance * distanceOfJourney;
+        return totalFare;
+    }
+
 
     public static void main(String[] args)
     {
