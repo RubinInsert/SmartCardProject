@@ -146,9 +146,8 @@ public class SystemInterface
             You need to let the user enter the IDs manually for both smartcards and journeys,
             and you are not allowed to generate/assign IDs randomly or automatically. */
 
-            SmartCard newTempCard = new SmartCard(cardID, type, balance);
             System.out.println("SmartCard created under ID: " + cardID);
-            smartCardUtil.sortSmartCard(newTempCard);
+            smartCardUtil.sortSmartCard(new SmartCard(cardID, type, balance););
             consoleUtil.waitForKeyPress(); 
             consoleUtil.clearScreen();
             displayMainScreen();
