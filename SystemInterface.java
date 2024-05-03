@@ -23,7 +23,7 @@ public class SystemInterface
         displayMainScreen();
         //This method should control the flow of the program
     }
-    int displayMainScreen() { // Returns the number the user returns when selecting a menu item. I.e. "Create a new Smart Card" -> returns 1.
+    int displayMainScreen() {
         System.out.println("===============- Smart Card Project - Main Menu -===============");
         System.out.println("1. Create a new Smart Card");
         System.out.println("2. Create a new Journey");
@@ -34,46 +34,36 @@ public class SystemInterface
         System.out.println("7. List Journeys on Smart Card");
         System.out.println("8. Total Fare Costs");
         System.out.println("=================================================================");
-        System.out.print("Input Menu Number: ");
-        int in = input.nextInt();
-        selectPage(in);
-        return in;
-    }
-    void selectPage(int pageNumber) {
-        switch (pageNumber) {
-            case 0:
-                displayMainScreen();
-                break;
-            case 1: // Create a new Smart Card
+        String inputString;
+        do {
+            System.out.print("Input Menu Number: ");
+            inputString = input.nextLine();
+            switch (inputString) {
+                case "1":  
                 createSmartCard();
-                break;
-            case 2: // Create a new Journey
+                case "2":
                 createJourney();
-                break;
-            case 3: // Delete a Smart Card
-                deleteSmartCard();
-                break;
-            case 4: // Delete a Journey
-                deleteJourney();
-                break;
-            case 5: // List Smart Cards
-                smartCardUtil.listAllSmartCards();
-                displayMainScreen();
-                break;
-            case 6: // List Journeys on Smart Card
-                listJourneysWithTransportMode();
-                break;
-            case 7: // List Transport specific Journeys
-                listJourneysOnSmartCard();
-                break;
-            case 8: // Total Fare Costs
-                calculateAndDisplayFareCosts();
-                break;
-            default:
-            consoleUtil.showError("Page Number Invalid!");
-                break;
-        }
+                case "3":
+                    deleteSmartCard();
+                case "4":
+                    deleteJourney();
+                case "5":
+                    smartCardUtil.listAllSmartCards();
+                    displayMainScreen();
+                case "6":
+                    listJourneysWithTransportMode();
+                case "7":
+                    listJourneysOnSmartCard();
+                case "8":
+                    calculateAndDisplayFareCosts();
+                    return Integer.parseInt(inputString);
+                default:
+                    consoleUtil.showError("Invalid input. Please enter a number between 1 and 8.");
+                    displayMainScreen();
+            }
+        } while (true);
     }
+    
 
     // Method to validate double inputs
     double validateDoubleInput(String prompt, double min, double max) {

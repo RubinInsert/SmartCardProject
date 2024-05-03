@@ -150,7 +150,7 @@ public class SmartCard {
     } 
 
     
-    // Method to delete a journey by its ID (KEEP THIS MEthod)
+    // Method to delete a journey by its ID (K)
     
     public void deleteJourney(int journeyID) {
         // Check if the journeyID matches any existing journey and delete it
