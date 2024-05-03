@@ -509,23 +509,24 @@ public class SystemInterface
     void listJourneysOnSmartCard() {
         if(!smartCardUtil.isAnySmartCardsCreated()) {
             consoleUtil.showError("No Smartcards exist yet to display any journeys!");
-
+            displayMainScreen();
         }
-        int executionCount = 0;
-        System.out.println("Which Smart Card would you like to list Journeys from? ");
-        int chosenCardMenuNumber;
-        for(int x = 0; x < smartCardUtil.getSmartCardCount(); x++) {
-            System.out.println((x+1) + ". ID: " + smartCardUtil.getSmartCard(x).getSmartCardID() + " || Card Type: " + smartCardUtil.getSmartCard(x).getType()); 
-        }
-        do {
-            if(executionCount > 0) consoleUtil.showError("Please enter a valid menu number (Between 1-" + smartCardUtil.getSmartCardCount() + ")");
-            System.out.print("Enter a menu number: ");
-            chosenCardMenuNumber = input.nextInt();
-            consoleUtil.clearScreen();
-            executionCount++;
-        } while (chosenCardMenuNumber < 1 || chosenCardMenuNumber > smartCardUtil.getSmartCardCount());
-        for(int x = 0; x < smartCardUtil.getSmartCardCount(); x++) { // Loop through again to find the card which corresponds with the menu number provided by the user
-            if((x+1) == chosenCardMenuNumber) {
+        else;
+            int executionCount = 0;
+            System.out.println("Which Smart Card would you like to list Journeys from? ");
+            int chosenCardMenuNumber;
+            for(int x = 0; x < smartCardUtil.getSmartCardCount(); x++) {
+                System.out.println((x+1) + ". ID: " + smartCardUtil.getSmartCard(x).getSmartCardID() + " || Card Type: " + smartCardUtil.getSmartCard(x).getType()); 
+            }
+            do {
+                if(executionCount > 0) consoleUtil.showError("Please enter a valid menu number (Between 1-" + smartCardUtil.getSmartCardCount() + ")");
+                System.out.print("Enter a menu number: ");
+                chosenCardMenuNumber = input.nextInt();
+                consoleUtil.clearScreen();
+                executionCount++;
+            } while (chosenCardMenuNumber < 1 || chosenCardMenuNumber > smartCardUtil.getSmartCardCount());
+            for(int x = 0; x < smartCardUtil.getSmartCardCount(); x++) { // Loop through again to find the card which corresponds with the menu number provided by the user
+                if((x+1) == chosenCardMenuNumber) {
                 SmartCard chosenSmartCard = smartCardUtil.getSmartCard(x);
                 if(chosenSmartCard.getJourneyCount() == 0) {
                     consoleUtil.showError("The selected card has no Journeys!");
