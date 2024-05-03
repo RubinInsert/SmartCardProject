@@ -2,20 +2,9 @@ import java.util.Scanner;
 //import java.util.concurrent.ThreadLocalRandom;
 //import java.util.concurrent.TimeUnit;
 
-/* DONE:
- * - Main Screen
- * - Create Smart Card Screen
- * - Create Journey Screen
- * - Delete Smart Card Screen
- * - List Smart Cards Screen
- * - Make so they cant load less than $5.00 on a Smartcard
- * - Delete a Journey
- * - List the Journeys on a Smart Card
- * - List of Journeys with a particular transport mode and which smartcard they belong to
- * - Summary of total cost/fare for all transportation modes journeys made by all Smartcards registered in the system.
- * TODO:
+/* 
+ * TODO
  * - Dont allow ID's to be less than zero (Journey, Smartcard)
- * - Calculate the distance of journey instead of asking user (should be the absolute value of the difference between the start and end of journey)
  * - Error is thrown when a non-int is given for a "Start of Journey" and "End of Journey", and i suspect many other integer inputs
  * - 
  */
@@ -88,7 +77,7 @@ public class SystemInterface
         }
     }
     void createSmartCard() {
-        if(smartCardUtil.getSmartCardCount() < 3) { // If there is an empty card slot available 
+        if(smartCardUtil.getSmartCardCount() < 3 ) { // If there is an empty card slot available 
             char type = ' ';
             double balance = 0;
             consoleUtil.clearScreen();
@@ -139,32 +128,18 @@ public class SystemInterface
                     consoleUtil.showError("The balance you entered is too low, please enter a balance greater than 5.");
                 } else {
                     check = true;
-                }
-}
-    
-
-            /*Can we write code that assigns IDs rather than allowing input by the user to
-            avoid them having the ability to duplicate IDs? Or do we have to write the code
-            so that the user has to input their own ID?
-
-
-            You need to let the user enter the IDs manually for both smartcards and journeys,
-            and you are not allowed to generate/assign IDs randomly or automatically. */
-
-            System.out.println("SmartCard created under ID: " + cardID);
-            smartCardUtil.sortSmartCard(new SmartCard(cardID, type, balance));
-            consoleUtil.waitForKeyPress(); 
-            consoleUtil.clearScreen();
-            displayMainScreen();
-            
-            
-        } else { // There is no empty card slot
+                    System.out.println("SmartCard created under ID: " + cardID);
+                    smartCardUtil.sortSmartCard(new SmartCard(cardID, type, balance));
+                    consoleUtil.waitForKeyPress(); 
+                    consoleUtil.clearScreen();
+                    displayMainScreen();  }
+                }}
+               
+        else { // There is no empty card slot
             consoleUtil.showError("You have reached max number of cards. You cannot create a new card until you delete one!");
             displayMainScreen();
-        }
+            }
     }
-
-
 
     void deleteSmartCard() {
         consoleUtil.clearScreen();
@@ -201,11 +176,11 @@ public class SystemInterface
 
         // Prompt user for journey details
         System.out.print("Enter Journey ID: ");
+    
+    
         int journeyID = input.nextInt();
 
         //input.nextLine(); // Consume newline character
-
-
 
         do {
         if(executionCount > 0) consoleUtil.showError("Please enter only one of the provided responses."); // If this isnt the first time executing this code, send an error to user.
@@ -232,15 +207,8 @@ public class SystemInterface
         } while (endOfJourney < 1 || endOfJourney > 10); // If user input is not within defined ranges ask question again.
         executionCount = 0;
 
-
-        System.out.print("Enter Distance of Journey: "); // What the flip do we do here gang
-        int distanceOfJourney = input.nextInt();
-        /*
-         * Are we allowed to calculate the distance of a journey based on the start and end
-            stop or do we have to ask the user for it?
-            "You are allowed to calculate the distance of the journey, but you aren't allowed to
-            use Math class. Again, as it's not covered in the course so far."
-         */
+        int distanceOfJourney = endOfJourney - startOfJourney; // Calculate distance of journey
+        
         // Create the journey object
         Journey newJourney = new Journey(journeyID, transportMode, startOfJourney, endOfJourney, distanceOfJourney);
 
@@ -310,13 +278,21 @@ public class SystemInterface
             }
             return null;
         }
-        void listAllSmartCards() {
+        // Checks if smartcard is created and if so prints it out. 
+        void listAllSmartCards() { 
             consoleUtil.clearScreen();
+        if (smartCard1 != null) {
             smartCard1.print();
-            smartCard2.print();
-            smartCard3.print();
-            consoleUtil.waitForKeyPress();
         }
+        if (smartCard2 != null) {
+            smartCard2.print();
+        }
+        if (smartCard3 != null) {
+            smartCard3.print();
+        }
+        consoleUtil.waitForKeyPress();
+    }
+
         void sortSmartCard(SmartCard sc) { // Place the new smartcard in the earliest available slot
             if(smartCard1 == null) { 
                 smartCard1 = sc;
