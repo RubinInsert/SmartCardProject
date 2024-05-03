@@ -84,9 +84,9 @@ public class SystemInterface
             int cardID;
             int executionCount = 0;
             do {
-                if(executionCount > 0) consoleUtil.showError("Please enter an ID Number greater than zero and is not currently being used by existing Smart Cards.");
+                if(executionCount > 0) consoleUtil.showError("Please enter an ID Number greater than or equal to zero and is not currently being used by existing Smart Cards.");
                 executionCount++;
-                System.out.print("Enter a number for the Card ID (greater than zero): ");
+                System.out.print("Enter a number for the Card ID (greater than or equal to zero): ");
                 cardID = input.nextInt();
                 for(int x = 0; x < smartCardUtil.getSmartCardCount(); x++) { // Loop over existing cards
                     if(cardID == smartCardUtil.getSmartCard(x).getSmartCardID()) { // Check if the new ID given by user matches any existing cards and throw error if a match is found.
@@ -144,7 +144,11 @@ public class SystemInterface
     void deleteSmartCard() {
         consoleUtil.clearScreen();
         System.out.print("Enter the Smart Card ID you want to delete: ");
-        int idToDelete = input.nextInt();
+        int idToDelete = input.nextInt(); 
+        if(idToDelete < 0) {
+            consoleUtil.showError("ID cannot be negative");
+            displayMainScreen();
+        }
         if (smartCard1 != null && smartCard1.getSmartCardID() == idToDelete) {
             smartCard1 = null;
             System.out.println("Smart Card with ID " + idToDelete + " has been deleted.");
@@ -208,7 +212,7 @@ public class SystemInterface
         executionCount = 0;
 
         int distanceOfJourney = endOfJourney - startOfJourney; // Calculate distance of journey
-        
+        distanceOfJourney = distanceOfJourney < 0 ? -1 * distanceOfJourney : distanceOfJourney; // ensure value is positive
         // Create the journey object
         Journey newJourney = new Journey(journeyID, transportMode, startOfJourney, endOfJourney, distanceOfJourney);
 
