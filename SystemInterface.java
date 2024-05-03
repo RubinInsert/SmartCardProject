@@ -88,7 +88,12 @@ public class SystemInterface
             }
             value = input.nextDouble();
             if (value < min || value > max) {
-                consoleUtil.showError("Please enter a number between " + min + " and " + max + ".");
+                if(max == Double.MAX_VALUE) { 
+                    consoleUtil.showError("Please enter a number greater than " + min + ".");
+                } else {
+                    consoleUtil.showError("Please enter a number between " + min + " and " + max + ".");
+                }
+                
                 displayMainScreen();
             }
         } while (value < min || value > max);
@@ -108,7 +113,11 @@ public class SystemInterface
             }
             value = input.nextInt();
             if (value < min || value > max) {
-                consoleUtil.showError("Please enter an integer between " + min + " and " + max + ".");
+                if(max == Integer.MAX_VALUE) {
+                    consoleUtil.showError("Please enter an integer greater than " + min + ".");
+                } else {
+                    consoleUtil.showError("Please enter an integer between " + min + " and " + max + ".");
+                }
                 displayMainScreen();
             }
         } while (value < min || value > max);
@@ -249,7 +258,10 @@ public class SystemInterface
             executionCount++;
         } while (endOfJourney < 1 || endOfJourney > 10); // If user input is not within defined ranges ask question again.
         executionCount = 0;
-
+        if(endOfJourney == startOfJourney) {
+            consoleUtil.showError("Start of Journey and End Of Journey stops cannot be equal!");
+            displayMainScreen();
+        }
         int distanceOfJourney = endOfJourney - startOfJourney; // Calculate distance of journey
         distanceOfJourney = distanceOfJourney < 0 ? -1 * distanceOfJourney : distanceOfJourney; // ensure value is positive
         // Create the journey object
@@ -324,6 +336,10 @@ public class SystemInterface
         // Checks if smartcard is created and if so prints it out. 
         void listAllSmartCards() { 
             consoleUtil.clearScreen();
+            if(!smartCardUtil.isAnySmartCardsCreated()) {
+                consoleUtil.showError("No Smartcards exist to be displayed!");
+                displayMainScreen();
+            }
         if (smartCard1 != null) {
             smartCard1.print();
         }
@@ -490,7 +506,8 @@ public class SystemInterface
 
         // If no journeys match the specified transport mode, display a message
         if (!foundJourney) {
-            System.out.println("No journeys with that transport mode.");
+            consoleUtil.showError("No journeys with that transport mode.");
+            displayMainScreen();
         }
 
         consoleUtil.waitForKeyPress();
@@ -498,6 +515,10 @@ public class SystemInterface
         displayMainScreen();
     }
     void listJourneysOnSmartCard() {
+        if(!smartCardUtil.isAnySmartCardsCreated()) {
+            consoleUtil.showError("No Smartcards exist yet to display any journeys!");
+
+        }
         int executionCount = 0;
         System.out.println("Which Smart Card would you like to list Journeys from? ");
         int chosenCardMenuNumber;
