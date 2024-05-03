@@ -1,11 +1,4 @@
 import java.util.Scanner;
-
-/* 
- * TODO
- * - Dont allow ID's to be less than zero (Journey, Smartcard)
- * - Error is thrown when a non-int is given for a "Start of Journey" and "End of Journey", and i suspect many other integer inputs
- * - 
- */
 public class SystemInterface
 {
     Scanner input;
@@ -63,7 +56,6 @@ public class SystemInterface
             }
         } while (true);
     }
-    
 
     // Method to validate double inputs
     double validateDoubleInput(String prompt, double min, double max) {
@@ -268,7 +260,7 @@ public class SystemInterface
         }
         do {
             if(executionCount > 0) consoleUtil.showError("Please enter a valid menu number (Between 1-" + menuNumberTracker + ")");
-            System.out.print("Enter a menu number: ");
+            System.out.print("Enter a card ID: ");
             chosenCardMenuNumber = input.nextInt();
             consoleUtil.clearScreen();
             executionCount++;
@@ -382,9 +374,11 @@ public class SystemInterface
 
     void calculateAndDisplayFareCosts() {
         double totalFare = 0;
+        boolean journeysCompleted = false; // Flag to track if any journeys have been completed
+    
         System.out.println("Total transport mode journeys cost/fare:");
         System.out.println("---------------------------------------------------------");
-
+    
         // Calculate total fare for all journeys
         for (int i = 0; i < smartCardUtil.getSmartCardCount(); i++) {
             SmartCard currentCard = smartCardUtil.getSmartCard(i);
@@ -395,33 +389,40 @@ public class SystemInterface
                         double fare = calculateFare(journey.getTransportMode(), currentCard.getType(), journey.getDistanceOfJourney());
                         totalFare += fare;
                         System.out.println("Total cost of " + journey.getTransportMode() + " journeys is $" + fare);
+                        journeysCompleted = true; // Set flag to true as at least one journey is found
                     }
                 }
             }
         }
-
-        // Display total fare
-        System.out.println("---------------------------------------------------------");
-        System.out.println("Total Fare: $" + totalFare);
-
-        // Breakdown by smart card
-        System.out.println("Breakdown by smartcard:");
-        System.out.println("---------------------------------------------------------");
-        for (int i = 0; i < smartCardUtil.getSmartCardCount(); i++) {
-            SmartCard currentCard = smartCardUtil.getSmartCard(i);
-            if (currentCard != null) {
-                double cardFare = 0;
-                for (int j = 0; j < currentCard.getJourneyCount(); j++) {
-                    Journey journey = currentCard.getJourney(j);
-                    if (journey != null) {
-                        cardFare += calculateFare(journey.getTransportMode(), currentCard.getType(), journey.getDistanceOfJourney());
+    
+        // Check if any journeys have been completed
+        if (!journeysCompleted) {
+            System.out.println("No journeys are being completed yet.");
+        } else {
+            // Display total fare
+            System.out.println("---------------------------------------------------------");
+            System.out.println("Total Fare: $" + totalFare);
+    
+            // Breakdown by smart card
+            System.out.println("Breakdown by smartcard:");
+            System.out.println("---------------------------------------------------------");
+            for (int i = 0; i < smartCardUtil.getSmartCardCount(); i++) {
+                SmartCard currentCard = smartCardUtil.getSmartCard(i);
+                if (currentCard != null) {
+                    double cardFare = 0;
+                    for (int j = 0; j < currentCard.getJourneyCount(); j++) {
+                        Journey journey = currentCard.getJourney(j);
+                        if (journey != null) {
+                            cardFare += calculateFare(journey.getTransportMode(), currentCard.getType(), journey.getDistanceOfJourney());
+                        }
                     }
+                    System.out.println("SmartCard " + currentCard.getSmartCardID() + ":");
+                    System.out.println("Total fare: $" + cardFare);
                 }
-                System.out.println("SmartCard " + currentCard.getSmartCardID() + ":");
-                System.out.println("Total fare: $" + cardFare);
             }
         }
     }
+    
         double calculateFare(String transportMode, char cardType, int distanceOfJourney) {
         double baseFare = 1.5; // Base fare for all types of smart cards
         double farePerDistance;
