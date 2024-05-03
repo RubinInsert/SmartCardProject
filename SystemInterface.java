@@ -97,11 +97,10 @@ public class SystemInterface
     int validateIntegerInput(String prompt, int min, int max) {
         int value;
         do {
-            System.out.print(prompt);
             while (!input.hasNextInt()) {
-                consoleUtil.showError("Please enter a valid integer.");
                 System.out.print(prompt);
                 input.next(); // Discard invalid input
+                consoleUtil.showError("Please enter a valid integer.");
             }
             value = input.nextInt();
             if (value < min || value > max) {
