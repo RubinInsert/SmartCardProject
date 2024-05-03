@@ -74,6 +74,42 @@ public class SystemInterface
                 break;
         }
     }
+
+    // Method to validate double inputs
+    double validateDoubleInput(String prompt, double min, double max) {
+        double value;
+        do {
+            System.out.print(prompt);
+            while (!input.hasNextDouble()) {
+                consoleUtil.showError("Please enter a valid number.");
+                System.out.print(prompt);
+                input.next(); // Discard invalid input
+            }
+            value = input.nextDouble();
+            if (value < min || value > max) {
+                consoleUtil.showError("Please enter a number between " + min + " and " + max + ".");
+            }
+        } while (value < min || value > max);
+        return value;
+    }
+
+    // Method to validate integer inputs
+    int validateIntegerInput(String prompt, int min, int max) {
+        int value;
+        do {
+            System.out.print(prompt);
+            while (!input.hasNextInt()) {
+                consoleUtil.showError("Please enter a valid integer.");
+                System.out.print(prompt);
+                input.next(); // Discard invalid input
+            }
+            value = input.nextInt();
+            if (value < min || value > max) {
+                consoleUtil.showError("Please enter an integer between " + min + " and " + max + ".");
+            }
+        } while (value < min || value > max);
+        return value;
+    }
     void createSmartCard() {
         if(smartCardUtil.getSmartCardCount() < 3 ) { // If there is an empty card slot available 
             char type = ' ';
@@ -85,7 +121,7 @@ public class SystemInterface
                 if(executionCount > 0) consoleUtil.showError("Please enter an ID Number greater than zero and is not currently being used by existing Smart Cards.");
                 executionCount++;
                 System.out.print("Enter a number for the Card ID (greater than zero): ");
-                cardID = input.nextInt();
+                cardID = validateIntegerInput("Enter a number for the Card ID (greater than zero): ", 1, Integer.MAX_VALUE);
                 for(int x = 0; x < smartCardUtil.getSmartCardCount(); x++) { // Loop over existing cards
                     if(cardID == smartCardUtil.getSmartCard(x).getSmartCardID()) { // Check if the new ID given by user matches any existing cards and throw error if a match is found.
                         cardID = -1; // trigger error in next while loop.
@@ -100,8 +136,8 @@ public class SystemInterface
             System.out.println("2. Senior");
             System.out.println("3. Adult");
             System.out.print("Enter menu number: ");
-            int in = input.nextInt();
-            switch (in) {
+            int typeMenu = validateIntegerInput("Enter menu number: ", 1, 3);
+            switch (typeMenu) {
                 case 1: // User chose "Child"
                     type = 'C';
                     break;
@@ -119,8 +155,7 @@ public class SystemInterface
             boolean check = false;
             while (!check) {
                 consoleUtil.clearScreen();
-                System.out.println("Enter the balance you wish to load onto the card: ");
-                balance = input.nextDouble();
+                balance = validateDoubleInput("Enter the balance you wish to load onto the card: ", 5.0, Double.MAX_VALUE);
                 if (balance < 5) {
                     consoleUtil.clearScreen();
                     consoleUtil.showError("The balance you entered is too low, please enter a balance greater than 5.");
@@ -130,15 +165,16 @@ public class SystemInterface
                     smartCardUtil.sortSmartCard(new SmartCard(cardID, type, balance));
                     consoleUtil.waitForKeyPress(); 
                     consoleUtil.clearScreen();
-                    displayMainScreen();  }
-                }}
-               
-        else { // There is no empty card slot
+                    displayMainScreen();  
+                }
+            }       
+        } else { // There is no empty card slot
             consoleUtil.showError("You have reached max number of cards. You cannot create a new card until you delete one!");
             displayMainScreen();
-            }
+        }
+        
     }
-
+    
     void deleteSmartCard() {
         consoleUtil.clearScreen();
         System.out.print("Enter the Smart Card ID you want to delete: ");
@@ -322,6 +358,7 @@ public class SystemInterface
             System.out.println("=================================================================");
             consoleUtil.waitForKeyPress();
             consoleUtil.clearScreen();
+            displayMainScreen();
         }
     
     }
