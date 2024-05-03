@@ -92,7 +92,8 @@ public class SystemInterface
         } while (value < min || value > max);
         return value;
     }
-
+    int min = 1;
+    int max = 3;
     // Method to validate integer inputs
     int validateIntegerInput(String prompt, int min, int max) {
         int value;
@@ -148,6 +149,7 @@ public class SystemInterface
                     break;
                 default:
                     consoleUtil.showError("The number you inputted was out of the range of the menu!");
+                    consoleUtil.waitForKeyPress();
                     displayMainScreen();
                     return;
             }
