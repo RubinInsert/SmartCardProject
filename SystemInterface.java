@@ -1,3 +1,5 @@
+// Sam Bosworth - Student Number: c3477699
+// Alex Rubin - Student Number: c3486124
 import java.util.Scanner;
 public class SystemInterface
 {

@@ -1,3 +1,7 @@
+// Sam Bosworth - Student Number: c3477699
+// Alex Rubin - Student Number: c3486124
+
+
 /*
  * This class represents a SmartCard used for managing travel on the public transport network.
  * It stores the following details about a smartcard:
