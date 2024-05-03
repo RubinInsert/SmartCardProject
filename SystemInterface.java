@@ -24,20 +24,21 @@ public class SystemInterface
         //This method should control the flow of the program
     }
     int displayMainScreen() {
-        System.out.println("===============- Smart Card Project - Main Menu -===============");
-        System.out.println("1. Create a new Smart Card");
-        System.out.println("2. Create a new Journey");
-        System.out.println("3. Delete a Smart Card");
-        System.out.println("4. Delete a Journey");
-        System.out.println("5. List Smart Cards");
-        System.out.println("6. List Transport specific Journeys");
-        System.out.println("7. List Journeys on Smart Card");
-        System.out.println("8. Total Fare Costs");
-        System.out.println("=================================================================");
         String inputString;
         do {
+            System.out.println("===============- Smart Card Project - Main Menu -===============");
+            System.out.println("1. Create a new Smart Card");
+            System.out.println("2. Create a new Journey");
+            System.out.println("3. Delete a Smart Card");
+            System.out.println("4. Delete a Journey");
+            System.out.println("5. List Smart Cards");
+            System.out.println("6. List Transport specific Journeys");
+            System.out.println("7. List Journeys on Smart Card");
+            System.out.println("8. Total Fare Costs");
+            System.out.println("=================================================================");
             System.out.print("Input Menu Number: ");
-            inputString = input.nextLine();
+            inputString = input.next();
+           // input.nextLine(); // consume remaining input
             switch (inputString) {
                 case "1":  
                 createSmartCard();
@@ -59,7 +60,6 @@ public class SystemInterface
                     return Integer.parseInt(inputString);
                 default:
                     consoleUtil.showError("Invalid input. Please enter a number between 1 and 8.");
-                    displayMainScreen();
             }
         } while (true);
     }
@@ -359,8 +359,9 @@ public class SystemInterface
     public class ConsoleUtil {
         public void waitForKeyPress() { // Wait for user to press Enter Key before proceeding with code execution.
             System.out.println("<Press Enter to Continue>");
-            input.nextLine(); // Consume first line.
-            input.nextLine();
+            input.nextLine(); // consume remaining characters from inputs.
+            input.nextLine(); // wait for user input.
+            
             
         }
         public void clearScreen() { // Creates a lot of new lines to clear the window -> Not system specific unlike "cls" for windows.
