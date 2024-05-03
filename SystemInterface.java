@@ -81,9 +81,9 @@ public class SystemInterface
         do {
             System.out.print(prompt);
             while (!input.hasNextDouble()) {
-                consoleUtil.showError("Please enter a valid number.");
                 System.out.print(prompt);
                 input.next(); // Discard invalid input
+                consoleUtil.showError("Please enter a valid number.");
             }
             value = input.nextDouble();
             if (value < min || value > max) {
