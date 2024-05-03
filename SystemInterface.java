@@ -84,10 +84,12 @@ public class SystemInterface
                 System.out.print(prompt);
                 input.next(); // Discard invalid input
                 consoleUtil.showError("Please enter a valid number.");
+                displayMainScreen();
             }
             value = input.nextDouble();
             if (value < min || value > max) {
                 consoleUtil.showError("Please enter a number between " + min + " and " + max + ".");
+                displayMainScreen();
             }
         } while (value < min || value > max);
         return value;
@@ -102,10 +104,12 @@ public class SystemInterface
                 System.out.print(prompt);
                 input.next(); // Discard invalid input
                 consoleUtil.showError("Please enter a valid integer.");
+                displayMainScreen();
             }
             value = input.nextInt();
             if (value < min || value > max) {
                 consoleUtil.showError("Please enter an integer between " + min + " and " + max + ".");
+                displayMainScreen();
             }
         } while (value < min || value > max);
         return value;
@@ -363,7 +367,6 @@ public class SystemInterface
             System.out.println("=================================================================");
             consoleUtil.waitForKeyPress();
             consoleUtil.clearScreen();
-            displayMainScreen();
         }
     
     }
