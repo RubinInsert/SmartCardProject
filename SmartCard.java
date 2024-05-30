@@ -18,12 +18,11 @@
  */
 
 public class SmartCard {
+    
     private int cardID;           // the id of the smartcard
     private char type;            // the type of the smartcard (it can be "C", "A" or "S")
     private double balance;       // the balance available on the smartcard
-    private Journey journey1;
-    private Journey journey2; // Only available for Adults and Seniors
-    private Journey journey3; // Only available for Seniors
+    private Journey[] journeys;
     /**
      * Constructs a SmartCard object with the given card ID, type, and balance.
      * @param cardID The ID of the smartcard.
@@ -98,78 +97,20 @@ public class SmartCard {
     public boolean hasReachedMaxJourneys() { // Determines whether a card has reached the capacity of Journeys it's specific type can hold.
         switch (type) {
             case 'C': // Children can have a maximum of 1 Journey
-                if(journey1 != null) return true;
-                break;
+                if(journeys.length >= 1) return true;
             case 'A': // Adults can have a maxiumum of 2 Journeys
-                if(journey1 != null && journey2 != null) return true;
+                if(journeys.length >= 2) return true;
             break;
             case 'S': // Seniors can have a maximum of 3 Journeys
-                if(journey1 != null && journey2 != null && journey3 != null) return true;
+                if(journeys.length >= 3) return true;
             break;
             default:
                 return false;
         }
         return false;
     }
-    public int getJourneyCount() { // returns number of journeys on the card
-        int count = 0;
-        if(journey1 != null) count++;
-        if(journey2 != null) count++;
-        if(journey3 != null) count++;
-        return count;
-    }
-    public void addJourney(Journey j) {
-        reorganiseJourneys();
-        if(journey1 == null) journey1 = j;
-        else if(journey2 == null) journey2 = j;
-        else if(journey3 == null) journey3 = j;
-    }
-    private void reorganiseJourneys() { // Removes gaps in the 3 Journey variables ( if user deletes one etc. ).
-        if(journey1 == null) {
-            journey1 = journey2;
-            journey2 = journey3;
-        }
-        if(journey2 == null) {
-            journey2 = journey3;
-        }
-    }
-    Journey getJourney(int index) {
-        reorganiseJourneys();
-        switch (index) {
-            case 0: 
-                return journey1;
-            case 1:
-                return journey2;
-            case 2:
-                return journey3;
-            default:
-            return null;
-        }
-    }
-    void print() {
-        System.out.println("Smartcard " + this.getSmartCardID() + " has type " + this.getTypeFormatted() + " and " + this.getJourneyCount() + " journey(s)");
-        for(int x=0; x < this.getJourneyCount(); x++) {
-            if(this.getJourney(x) != null) this.getJourney(x).printTruncated();
-        }
-    } 
-
-    
-    // Method to delete a journey by its ID (K)
-    
-    public void deleteJourney(int journeyID) {
-        // Check if the journeyID matches any existing journey and delete it
-        if (journey1 != null && journey1.getJourneyID() == journeyID) {
-            journey1 = null;
-            System.out.println("Journey with ID " + journeyID + " has been deleted.");
-        } else if ((type == 'A' || type == 'S') && journey2 != null && journey2.getJourneyID() == journeyID) {
-            journey2 = null;
-            System.out.println("Journey with ID " + journeyID + " has been deleted.");
-        } else if (type == 'S' && journey3 != null && journey3.getJourneyID() == journeyID) {
-            journey3 = null;
-            System.out.println("Journey with ID " + journeyID + " has been deleted.");
-        } else {
-            System.out.println("Journey with ID " + journeyID + " not found or cannot be deleted.");
-        }
+    public Journey[] getJourneys() {
+        return journeys;
     }
     /**
      * Checks if the given card type is valid ("C", "A", or "S").
