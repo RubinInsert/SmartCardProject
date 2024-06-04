@@ -23,29 +23,42 @@ public class SystemInterface
                                                                                                         "List Smart Cards",
                                                                                                         "List Transport specific Journeys",
                                                                                                         "List Journeys on Smart Card",
-                                                                                                        "Total Fare Costs"});
+                                                                                                        "Total Fare Costs",
+                                                                                                        "Import Smart Cards and Journeys",
+                                                                                                        "Export Smart Cards and Journeys"});
             switch (inputString) {
                 case 1:  
                 CreateSmartCardPage();
                 // Create Smart Card
                 break;
                 case 2:
+                DeleteSmartCardPage();
                 // Delete a Smart Card
                 break; 
                 case 3:
+                DeleteJourneyPage();
                 // Delete a Journey
                 break;
                 case 4:
+                ListAllSmartCardsPage();
                     // List all Smart Cards
+                
                     break;
                 case 5:
                     // List all Journeys with a specific transport type
                     break;
                 case 6:
                     // List all Journeys on a specific Smart Card
+                    ListJourneysOnSmartCardPage();
                     break;
                 case 7:
                     // Print Fare Costs
+                    break;
+                case 8:
+                    // Import Smartcards and Journeys from external file
+                    break;
+                case 9:
+                    // Export Smartcards and Journey to external file
                     break;
                 default:
                     ConsoleUtil.showError("Invalid input. Please enter a number between 1 and 8.");
@@ -99,9 +112,72 @@ public class SystemInterface
                 continue;
             }
             smartCard.FillFirstEmptyJourney(createdJourney);
-            ConsoleUtil.clearScreen();
-            displayMainScreen();
         }
+        ConsoleUtil.clearScreen();
+        displayMainScreen();
+   }
+   void DeleteSmartCardPage() {
+    int userInputID = ConsoleUtil.GetInt("Enter Smart Card ID for which you would like to delete: ", 0, 9999);
+    if(SmartCard.getFromID(userInputID) != null) {
+        SmartCard.getFromID(userInputID).Delete();
+    } else {
+        ConsoleUtil.showError("Smart Card with ID #" + userInputID + " could not be found!");
+    }
+   }
+   void DeleteJourneyPage() {
+    int userInputCardID = ConsoleUtil.GetInt("Enter Smart Card ID for which the journey can be found: ", 0, 9999);
+    if(SmartCard.getFromID(userInputCardID) != null) {
+        int userInputJourneyID = ConsoleUtil.GetInt("Enter Journey ID for which you would like to delete: ", 0, 9999);
+        if(SmartCard.getFromID(userInputCardID).getJourneyByID(userInputJourneyID) != null) {
+            SmartCard.getFromID(userInputCardID).getJourneyByID(userInputJourneyID).Delete();
+        } else {
+            ConsoleUtil.showError("Journey with ID #" + userInputJourneyID + " could not be found!");
+        }
+    } else {
+        ConsoleUtil.showError("Smart Card with ID #" + userInputCardID + " could not be found!");
+    }      
+   }
+   void ListAllSmartCardsPage() {
+        if(SmartCard.getTotalCards() == 0) {
+            ConsoleUtil.showError("No Cards have been created!");
+            return;
+        }
+        for(int sc = 0; sc < smartCards.length; sc++) {
+            SmartCard currentSmartCard = smartCards[sc];
+            if(currentSmartCard == null) continue;
+            System.out.println("Smartcard #" + currentSmartCard.getSmartCardID() + " has type " + currentSmartCard.getTypeFormatted() + " and " + currentSmartCard.getTotalJourneys() + " journey(s)");
+            for(int j = 0; j < smartCards[sc].getJourneys().length; j++) {
+                Journey currentJourney = currentSmartCard.getJourneys()[j];
+                if(currentJourney == null) continue;
+                System.out.println("        Journey #" + currentJourney.getJourneyID() + " has transport mode " + currentJourney.getTransportMode());
+            }
+        }
+        ConsoleUtil.waitForKeyPress();
+   }
+   void ListJourneysOnSmartCardPage() {
+    if(SmartCard.getTotalCards() == 0) {
+        ConsoleUtil.showError("There are no Smart Cards Created yet!");
+        return;
+    }
+    int smartCardID = ConsoleUtil.GetInt("Enter Smart Card ID (0 - 9999): ", 0, 9999);
+    if(SmartCard.getFromID(smartCardID) == null) {
+        ConsoleUtil.showError("Could not find a Smart Card with this ID!");
+        return;
+    }
+    SmartCard smartCard = SmartCard.getFromID(smartCardID);
+    if(smartCard.getTotalJourneys() == 0) {
+        ConsoleUtil.showError("Smart Card #" + smartCardID + " has no Journeys linked to it!");
+        return;
+    }
+    ConsoleUtil.clearScreen();
+    Journey[] j = smartCard.getJourneys();
+    for(int x = 0; x < smartCard.getJourneys().length; x++) {
+        if(j[x] == null) continue;
+        System.out.println("Journey #" + j[x].getJourneyID() + " has transport mode " + j[x].getTransportMode() 
+                            + " starting from Stop #" + j[x].getStartOfJourney() + " and ending at Stop #" + j[x].getEndOfJourney()
+                            + "with journey distance of " + j[x].getDistanceOfJourney() + " stop(s).");
+    }
+    ConsoleUtil.waitForKeyPress();
    }
    public int randomInt(int min, int max) {
     return (int)(Math.random() * ((max - min) + 1));

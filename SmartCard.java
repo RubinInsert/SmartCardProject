@@ -139,6 +139,12 @@ public class SmartCard {
         }
         return null;
     }
+    public void deleteJourneyByID(int id) {
+        for(int x = 0; x < journeys.length; x ++) {
+            if(journeys[x] == null) continue;
+            if(journeys[x].getJourneyID() == id) journeys[x] = null;
+        }
+    }
     public static int FillFirstEmpty(SmartCard sc) { // returns index the smartcard was placed at. Returns -1 if no slot was found.
         for(int x = 0; x < SystemInterface.smartCards.length; x++) {
             
@@ -154,6 +160,7 @@ public class SmartCard {
             
             if(journeys[x] == null) {
                 journeys[x] = j;
+                j.setParentCard(this);
                 return x;
             }
         }
@@ -171,6 +178,29 @@ public class SmartCard {
             if(SystemInterface.smartCards[x].cardID == id) return SystemInterface.smartCards[x];
         }
         return null;
+    }
+    public void Delete() {
+        for(int x = 0; x < SystemInterface.smartCards.length; x++) {
+            if(SystemInterface.smartCards[x] == this) SystemInterface.smartCards[x] = null;
+        }
+    }
+    public static int getTotalCards() { // returns number of cards currently existing
+        int y = 0;
+        for(int x = 0; x < SystemInterface.smartCards.length; x++) {
+            if(SystemInterface.smartCards[x] != null) {
+                y++;
+            }
+        }
+        return y;
+    }
+    public int getTotalJourneys() {
+        int y = 0;
+        for(int x = 0; x < journeys.length; x++) {
+            if(journeys[x] != null) {
+                y++;
+            }
+        }
+        return y;
     }
     /**
      * Checks if the given card type is valid ("C", "A", or "S").

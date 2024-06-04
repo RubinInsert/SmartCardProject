@@ -6,7 +6,7 @@ public class Journey {
     private int startOfJourney;
     private int endOfJourney;
     private int distanceOfJourney;
-
+    private SmartCard parentCard;
     public Journey(int journeyID, String transportMode, int startOfJourney, int endOfJourney, int distanceOfJourney) {
         this.journeyID = journeyID;
         this.transportMode = transportMode;
@@ -50,6 +50,12 @@ public class Journey {
 
     public void setDistanceOfJourney(int distanceOfJourney) {
         this.distanceOfJourney = distanceOfJourney;
+    }
+    public void setParentCard(SmartCard parent) {
+        parentCard = parent;
+    }
+    public void Delete() {
+        parentCard.deleteJourneyByID(this.journeyID);
     }
     void printTruncated() {
         System.out.println("    Journey " + this.getJourneyID() + " has transport mode " + this.getTransportMode());
