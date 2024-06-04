@@ -25,8 +25,7 @@ public class SystemInterface
                                                                                                         "Total Fare Costs"});
             switch (inputString) {
                 case 1:  
-                ConsoleUtil.GetInt("test");
-                System.out.println(ConsoleUtil.GetString("test"));
+                CreateSmartCardPage();
                 // Create Smart Card
                 break;
                 case 2:
@@ -53,7 +52,18 @@ public class SystemInterface
         } while (true);
     }
 
-   
+   void CreateSmartCardPage() {
+   }
+   int FillFirstEmptySmartCard(SmartCard sc) { // returns index the smartcard was placed at. Returns -1 if no slot was found.
+    for(int x = 0; x < smartCards.length; x++) {
+        
+        if(smartCards[x] == null) {
+            smartCards[x] = sc;
+            return x;
+        }
+    }
+    return -1;
+   }
     public static class ConsoleUtil {
         public static void waitForKeyPress() { // Wait for user to press Enter Key before proceeding with code execution.
             System.out.println("<Press Enter to Continue>");
