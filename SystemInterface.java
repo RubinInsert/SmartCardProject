@@ -45,6 +45,7 @@ public class SystemInterface
                 
                     break;
                 case 5:
+                    ListAllJourneysSpecificTransportPage();
                     // List all Journeys with a specific transport type
                     break;
                 case 6:
@@ -53,6 +54,7 @@ public class SystemInterface
                     break;
                 case 7:
                     // Print Fare Costs
+                    CalculateTotalFareCostsPage();
                     break;
                 case 8:
                     // Import Smartcards and Journeys from external file
@@ -67,6 +69,7 @@ public class SystemInterface
     }
 
    void CreateSmartCardPage() {
+        ConsoleUtil.clearScreen();
         if(!SmartCard.isAnySlotAvailable()) { // Check if no slots are empty (a)
             ConsoleUtil.showError("There are no available slots to enter a new Smart Card!");
             displayMainScreen();
@@ -75,8 +78,8 @@ public class SystemInterface
             while(SmartCard.getFromID(newCardID) != null) { // There is an existing smartcard with this ID. Assign a random ID. This while loop should only
                 newCardID = randomInt(0, 9999);     // once, but may run more if the randomInt() function happens to spit out an already existing smart card
             }
-        double cardBalance = ConsoleUtil.GetDouble("Enter a balance for the Smartcard (minimum of $5)", 5, Double.MAX_VALUE); // Get balance for the smartcard (c)
-        String cardType = ConsoleUtil.GetString("Enter a Smartcard type ('C' for Child, 'A' for Adult, or 'S' for Senior): ");
+        double cardBalance = ConsoleUtil.GetDouble("Enter a balance for the Smartcard (minimum of $5): ", 5, Double.MAX_VALUE); // Get balance for the smartcard (c)
+        String cardType = ConsoleUtil.GetString("Enter a Smartcard type ('C' for Child, 'A' for Adult, or 'S' for Senior): ").toUpperCase();
         while(!SmartCard.isValidType(cardType.toUpperCase().charAt(0))) { // Ensure SmartCard type is either 'C', 'A', or 'S'. Menu cannot be used as brief specifies something is inputted. (d)
             ConsoleUtil.showError("Ensure your response is either 'C', 'A', or 'S'.");
             cardType = ConsoleUtil.GetString("Enter a Smartcard type ('C' for Child, 'A' for Adult, or 'S' for Senior): ").toUpperCase();
@@ -117,19 +120,27 @@ public class SystemInterface
         displayMainScreen();
    }
    void DeleteSmartCardPage() {
+    ConsoleUtil.clearScreen();
     int userInputID = ConsoleUtil.GetInt("Enter Smart Card ID for which you would like to delete: ", 0, 9999);
     if(SmartCard.getFromID(userInputID) != null) {
         SmartCard.getFromID(userInputID).Delete();
+        ConsoleUtil.clearScreen();
+        System.out.println("Smart Card #" + userInputID + " has been deleted successfully!");
+        ConsoleUtil.waitForKeyPress();
     } else {
         ConsoleUtil.showError("Smart Card with ID #" + userInputID + " could not be found!");
     }
    }
    void DeleteJourneyPage() {
+    ConsoleUtil.clearScreen();
     int userInputCardID = ConsoleUtil.GetInt("Enter Smart Card ID for which the journey can be found: ", 0, 9999);
     if(SmartCard.getFromID(userInputCardID) != null) {
         int userInputJourneyID = ConsoleUtil.GetInt("Enter Journey ID for which you would like to delete: ", 0, 9999);
         if(SmartCard.getFromID(userInputCardID).getJourneyByID(userInputJourneyID) != null) {
             SmartCard.getFromID(userInputCardID).getJourneyByID(userInputJourneyID).Delete();
+            ConsoleUtil.clearScreen();
+            System.out.println("Journey #" + userInputJourneyID + " on card #" + userInputCardID + " has been deleted successfully!");
+            ConsoleUtil.waitForKeyPress();
         } else {
             ConsoleUtil.showError("Journey with ID #" + userInputJourneyID + " could not be found!");
         }
@@ -138,6 +149,7 @@ public class SystemInterface
     }      
    }
    void ListAllSmartCardsPage() {
+        ConsoleUtil.clearScreen();
         if(SmartCard.getTotalCards() == 0) {
             ConsoleUtil.showError("No Cards have been created!");
             return;
@@ -154,7 +166,45 @@ public class SystemInterface
         }
         ConsoleUtil.waitForKeyPress();
    }
+   void ListAllJourneysSpecificTransportPage() {
+    if(SmartCard.getTotalCards() == 0) {
+        ConsoleUtil.showError("There are no Smart Cards Created yet!");
+        return;
+    }
+    String selectedTransport = "";
+    switch (ConsoleUtil.GetFromMenu("Enter a Journey Type", new String[] {"Train", "Bus", "Tram"})) {
+        case 1:
+        selectedTransport = "TRAIN";
+            break;
+        case 2:
+        selectedTransport = "BUS";
+            break;
+        case 3:
+        selectedTransport = "TRAM";
+            break;
+    }
+    int numOfCorrectJourneys = 0;
+    for(int x = 0; x < smartCards.length; x++) {
+        if(smartCards[x] == null) continue;
+        
+        for(int y = 0; y < smartCards[x].getJourneys().length; y++) {
+            if(smartCards[x].getTotalJourneys() == 0) break;
+            Journey j = smartCards[x].getJourneys()[y];
+            if(j == null) continue;
+            if(j.getTransportMode() == selectedTransport) {
+                numOfCorrectJourneys++;
+                System.out.println("Journey #" + j.getJourneyID() + " has that transport mode, and it belongs to smartcard #" + smartCards[x].getSmartCardID());
+            }
+        }
+    }
+    if(numOfCorrectJourneys == 0) {
+        ConsoleUtil.showError("There are no Journeys with this transport mode!");
+    } else {
+        ConsoleUtil.waitForKeyPress();
+    }
+   }
    void ListJourneysOnSmartCardPage() {
+    ConsoleUtil.clearScreen();
     if(SmartCard.getTotalCards() == 0) {
         ConsoleUtil.showError("There are no Smart Cards Created yet!");
         return;
@@ -177,6 +227,46 @@ public class SystemInterface
                             + " starting from Stop #" + j[x].getStartOfJourney() + " and ending at Stop #" + j[x].getEndOfJourney()
                             + "with journey distance of " + j[x].getDistanceOfJourney() + " stop(s).");
     }
+    ConsoleUtil.waitForKeyPress();
+   }
+   void CalculateTotalFareCostsPage() {
+    ConsoleUtil.clearScreen();
+    double totalFareCost = 0, totalBusCost = 0, totalTrainCost = 0, totalTramCost = 0;
+    if(SmartCard.getTotalCards() == 0) {
+        ConsoleUtil.showError("There are no Smart Cards Created yet!");
+        return;
+    }
+    for(int x = 0; x < smartCards.length; x++) {
+        if(smartCards[x] == null) continue;
+        
+        for(int y = 0; y < smartCards[x].getJourneys().length; y++) {
+            if(smartCards[x].getTotalJourneys() == 0) break;
+            Journey j = smartCards[x].getJourneys()[y];
+            if(j == null) continue;
+            switch (j.getTransportMode()) {
+                case "TRAIN":
+                    totalTrainCost += 1.5 * 1.86 * j.getDistanceOfJourney();
+                    totalFareCost += 1.5 * 1.86 * j.getDistanceOfJourney();
+                    break;
+                case "TRAM":
+                    totalTramCost += 1.5 + 2.24 * j.getDistanceOfJourney();
+                    totalFareCost += 1.5 + 2.24 * j.getDistanceOfJourney();
+                    break;
+                case "BUS":
+                    totalBusCost += 1.5 + 1.60 * j.getDistanceOfJourney();
+                    totalFareCost += 1.5 + 1.60 * j.getDistanceOfJourney();
+                    break;
+                default:
+                    break;
+            }
+        }
+    }
+    ConsoleUtil.clearScreen();
+    System.out.println("Total transport mode journeys cost/fare: $" + totalFareCost);
+    System.out.println("=============================================================");
+    System.out.println("Total cost of Train Journeys is $" + totalTrainCost);
+    System.out.println("Total cost of Bus Journeys is $" + totalBusCost);
+    System.out.println("Total cost of Tram Journeys is $" + totalTramCost);
     ConsoleUtil.waitForKeyPress();
    }
    public int randomInt(int min, int max) {
