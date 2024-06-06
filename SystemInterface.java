@@ -1,4 +1,13 @@
+//import java.io.PrintWriter;
+//import java.io.FileNotFoundException;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.Scanner;
+
 public class SystemInterface
 {
     Scanner input;
@@ -28,6 +37,8 @@ public class SystemInterface
             System.out.println("6. List Transport specific Journeys");
             System.out.println("7. List Journeys on Smart Card");
             System.out.println("8. Total Fare Costs");
+            System.out.println("9. Import File");
+            System.out.println("10. Export File");
             System.out.println("=================================================================");
             System.out.print("Input Menu Number: ");
             inputString = input.next();
@@ -51,8 +62,12 @@ public class SystemInterface
                 case "8":
                     calculateAndDisplayFareCosts();
                     return Integer.parseInt(inputString);
+                case "9":
+                    createfile();
+                case "10":
+                    importfile();
                 default:
-                    consoleUtil.showError("Invalid input. Please enter a number between 1 and 8.");
+                    consoleUtil.showError("Invalid input. Please enter a number between 1 and 10.");
             }
         } while (true);
     }
@@ -75,7 +90,6 @@ public class SystemInterface
                 } else {
                     consoleUtil.showError("Please enter a number between " + min + " and " + max + ".");
                 }
-                
                 displayMainScreen();
             }
         } while (value < min || value > max);
@@ -293,6 +307,7 @@ public class SystemInterface
             if(smartCard3 != null && !smartCard3.hasReachedMaxJourneys()) count++;
             return count;
         }
+        // Can  we remove this now??
         SmartCard getSmartCard(int index) { // Ugly function to get around the fact we cant use arrays. Allows you to index smartcards. I.e getSmartCard(2) returns the second available smart card.
             switch (index) {
                 case 0: 
@@ -316,7 +331,7 @@ public class SystemInterface
             return null;
         }
         // Checks if smartcard is created and if so prints it out. 
-        void listAllSmartCards() { 
+        void listAllSmartCards() { // need to add loop
             consoleUtil.clearScreen();
             if(!smartCardUtil.isAnySmartCardsCreated()) {
                 consoleUtil.showError("No Smartcards exist to be displayed!");
@@ -507,6 +522,7 @@ public class SystemInterface
         displayMainScreen();
     }
     void listJourneysOnSmartCard() {
+        // Need to add a loop
         if(!smartCardUtil.isAnySmartCardsCreated()) {
             consoleUtil.showError("No Smartcards exist yet to display any journeys!");
             displayMainScreen();
@@ -540,6 +556,42 @@ public class SystemInterface
             }
         }
     }
+
+    // Saves all smartcard and journey information into a new txt file
+    void createfile() {
+        try (PrintWriter writer = new PrintWriter("smartcards.txt")) {
+            if (smartCard1 != null) writer.println(smartCard1.toString());
+            if (smartCard2 != null) writer.println(smartCard2.toString());
+            if (smartCard3 != null) writer.println(smartCard3.toString());
+            System.out.println("File saved successfully.");
+        } catch (FileNotFoundException e) {
+            System.out.println("Error saving file: " + e.getMessage());
+        }
+    }
+
+    // Imports smartcard and journey information into program from a txt file
+    void importfile() {
+        try (BufferedReader reader = new BufferedReader(new FileReader("smartcards.txt"))) {
+            String line;
+            SmartCard[] importedCards = new SmartCard[3];
+            int index = 0;
+            while ((line = reader.readLine()) != null) {
+                SmartCard smartCard = SmartCard.fromString(line);
+                if (index < importedCards.length) {
+                    importedCards[index++] = smartCard;
+                }
+            }
+            if (importedCards.length > 0) {
+                if (importedCards[0] != null) smartCard1 = importedCards[0];
+                if (importedCards[1] != null) smartCard2 = importedCards[1];
+                if (importedCards[2] != null) smartCard3 = importedCards[2];
+            }
+            System.out.println("File imported successfully.");
+        } catch (IOException e) {
+            System.out.println("Error importing file: " + e.getMessage());
+        }
+    }
+
     public static void main(String[] args)
     {
         SystemInterface systemUI = new SystemInterface();
