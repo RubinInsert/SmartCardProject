@@ -1,3 +1,18 @@
+/*
+ * This class represents a SmartCard used for managing travel on the public transport network.
+ * It stores the following details about a smartcard:
+ *   - cardID: The ID of the smartcard.
+ *   - type: The type of the card, which can be "C" for Child, "A" for Adult, or "S" for Senior.
+ *   - balance: The balance available on the smartcard.
+ * 
+ * The class provides methods to:
+ *   - Retrieve the card ID, type, and balance.
+ *   - Add balance to the smartcard.
+ *   - Deduct balance for a journey.
+ *   - Check if the balance is sufficient for a journey.
+ *   - Check if a given card type is valid.
+ */
+
 public class SmartCard {
     private int cardID;           // the id of the smartcard
     private char type;            // the type of the smartcard (it can be "C", "A" or "S")
@@ -5,7 +20,6 @@ public class SmartCard {
     private Journey journey1;
     private Journey journey2; // Only available for Adults and Seniors
     private Journey journey3; // Only available for Seniors
-
     /**
      * Constructs a SmartCard object with the given card ID, type, and balance.
      * @param cardID The ID of the smartcard.
@@ -33,7 +47,6 @@ public class SmartCard {
     public char getType() {
         return type;
     }
-
     public String getTypeFormatted() { // Return a prettified version of the Smart Card Type.
         switch(type) {
             case 'C':
@@ -46,7 +59,6 @@ public class SmartCard {
                 return null;    
         }
     }
-
     /**
      * Retrieves the balance available on the smartcard.
      * @return The balance available on the smartcard.
@@ -79,7 +91,6 @@ public class SmartCard {
     public boolean canDeduct(double amount) {
         return balance >= amount;
     }
-
     public boolean hasReachedMaxJourneys() { // Determines whether a card has reached the capacity of Journeys it's specific type can hold.
         switch (type) {
             case 'C': // Children can have a maximum of 1 Journey
@@ -96,7 +107,6 @@ public class SmartCard {
         }
         return false;
     }
-
     public int getJourneyCount() { // returns number of journeys on the card
         int count = 0;
         if(journey1 != null) count++;
@@ -104,26 +114,22 @@ public class SmartCard {
         if(journey3 != null) count++;
         return count;
     }
-
     public void addJourney(Journey j) {
         reorganiseJourneys();
         if(journey1 == null) journey1 = j;
         else if(journey2 == null) journey2 = j;
         else if(journey3 == null) journey3 = j;
     }
-
     private void reorganiseJourneys() { // Removes gaps in the 3 Journey variables ( if user deletes one etc. ).
         if(journey1 == null) {
             journey1 = journey2;
             journey2 = journey3;
-            journey3 = null;
-        } else if(journey2 == null) {
+        }
+        if(journey2 == null) {
             journey2 = journey3;
-            journey3 = null;
         }
     }
-
-    public Journey getJourney(int index) {
+    Journey getJourney(int index) {
         reorganiseJourneys();
         switch (index) {
             case 0: 
@@ -133,18 +139,19 @@ public class SmartCard {
             case 2:
                 return journey3;
             default:
-                return null;
+            return null;
         }
     }
-
-    public void print() {
+    void print() {
         System.out.println("Smartcard " + this.getSmartCardID() + " has type " + this.getTypeFormatted() + " and " + this.getJourneyCount() + " journey(s)");
         for(int x=0; x < this.getJourneyCount(); x++) {
             if(this.getJourney(x) != null) this.getJourney(x).printTruncated();
         }
-    }
+    } 
 
+    
     // Method to delete a journey by its ID (K)
+    
     public void deleteJourney(int journeyID) {
         // Check if the journeyID matches any existing journey and delete it
         if (journey1 != null && journey1.getJourneyID() == journeyID) {
@@ -160,7 +167,6 @@ public class SmartCard {
             System.out.println("Journey with ID " + journeyID + " not found or cannot be deleted.");
         }
     }
-
     /**
      * Checks if the given card type is valid ("C", "A", or "S").
      * @param type The card type to check.
@@ -168,37 +174,7 @@ public class SmartCard {
      */
     public boolean isValidType(char type) {
         return type == 'C' || type == 'A' || type == 'S';
-    }
 
-    /**
-     * Serializes the SmartCard object to a string.
-     * @return The serialized string representation of the SmartCard object.
-     */
-    @Override
-    public String toString() {
-        StringBuilder sb = new StringBuilder();
-        sb.append(cardID).append(",").append(type).append(",").append(balance);
-        if (journey1 != null) sb.append(",").append(journey1.toString());
-        if (journey2 != null) sb.append(",").append(journey2.toString());
-        if (journey3 != null) sb.append(",").append(journey3.toString());
-        return sb.toString();
-    }
 
-    /**
-     * Deserializes a SmartCard object from a string.
-     * @param smartCardString The string representation of the SmartCard object.
-     * @return The deserialized SmartCard object.
-     */
-    public static SmartCard fromString(String smartCardString) {
-        String[] parts = smartCardString.split(",");
-        int cardID = Integer.parseInt(parts[0]);
-        char type = parts[1].charAt(0);
-        double balance = Double.parseDouble(parts[2]);
-        SmartCard smartCard = new SmartCard(cardID, type, balance);
-        for (int i = 3; i < parts.length; i++) {
-            Journey journey = Journey.fromString(parts[i]);
-            smartCard.addJourney(journey);
-        }
-        return smartCard;
     }
 }
