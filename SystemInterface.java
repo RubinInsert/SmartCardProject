@@ -42,6 +42,7 @@ public class SystemInterface
             System.out.println("=================================================================");
             System.out.print("Input Menu Number: ");
             inputString = input.next();
+           // input.nextLine(); // consume remaining input
             switch (inputString) {
                 case "1":  
                 createSmartCard();
