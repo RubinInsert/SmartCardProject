@@ -1,32 +1,19 @@
-//import java.io.PrintWriter;
-//import java.io.FileNotFoundException;
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.IOException;
-import java.io.PrintWriter;
 import java.util.Scanner;
 
 public class SystemInterface
 {
-    Scanner input;
-    SmartCard smartCard1;
-    SmartCard smartCard2;
-    SmartCard smartCard3;
+    static Scanner input;
+    public static SmartCard[] smartCards = new SmartCard[10]; // static keyword indicates it is not a instance variable and therefore can be made public.
     ConsoleUtil consoleUtil; // Cant use static objects, have to make do with this :(
-    SmartCardUtil smartCardUtil;
     private void run()
     {
         input = new Scanner(System.in);
-        consoleUtil = new ConsoleUtil();
-        smartCardUtil = new SmartCardUtil();
-        consoleUtil.clearScreen();
+        ConsoleUtil.clearScreen();
         displayMainScreen();
         //This method should control the flow of the program
     }
     int displayMainScreen() {
-        String inputString;
+        int inputString;
         do {
             System.out.println("===============- Smart Card Project - Main Menu -===============");
             System.out.println("1. Create a new Smart Card");
@@ -37,11 +24,10 @@ public class SystemInterface
             System.out.println("6. List Transport specific Journeys");
             System.out.println("7. List Journeys on Smart Card");
             System.out.println("8. Total Fare Costs");
-            System.out.println("9. Import File");
-            System.out.println("10. Export File");
             System.out.println("=================================================================");
             System.out.print("Input Menu Number: ");
             inputString = input.next();
+           // input.nextLine(); // consume remaining input
             switch (inputString) {
                 case "1":  
                 createSmartCard();
@@ -61,12 +47,8 @@ public class SystemInterface
                 case "8":
                     calculateAndDisplayFareCosts();
                     return Integer.parseInt(inputString);
-                case "9":
-                    createfile();
-                case "10":
-                    importfile();
                 default:
-                    consoleUtil.showError("Invalid input. Please enter a number between 1 and 10.");
+                    consoleUtil.showError("Invalid input. Please enter a number between 1 and 8.");
             }
         } while (true);
     }
@@ -89,6 +71,7 @@ public class SystemInterface
                 } else {
                     consoleUtil.showError("Please enter a number between " + min + " and " + max + ".");
                 }
+                
                 displayMainScreen();
             }
         } while (value < min || value > max);
@@ -149,47 +132,21 @@ public class SystemInterface
                 case 1: // User chose "Child"
                     type = 'C';
                     break;
-                case 2: // User chose "Senior"
-                    type = 'S';
+                case 8:
+                    // Import Smartcards and Journeys from external file
                     break;
-                case 3: // User chose "Adult"
-                    type = 'A';
+                case 9:
+                    // Export Smartcards and Journey to external file
                     break;
                 default:
-                    consoleUtil.showError("The number you inputted was out of the range of the menu!");
-                    consoleUtil.waitForKeyPress();
-                    displayMainScreen();
-                    return;
+                    ConsoleUtil.showError("Invalid input. Please enter a number between 1 and 8.");
             }
-            boolean check = false;
-            while (!check) {
-                consoleUtil.clearScreen();
-                balance = validateDoubleInput("Enter the balance you wish to load onto the card: ", 5.0, Double.MAX_VALUE);
-                if (balance < 5) {
-                    consoleUtil.clearScreen();
-                    consoleUtil.showError("The balance you entered is too low, please enter a balance greater than 5.");
-                } else {
-                    check = true;
-                    System.out.println("SmartCard created under ID: " + cardID);
-                    smartCardUtil.sortSmartCard(new SmartCard(cardID, type, balance));
-                    consoleUtil.waitForKeyPress(); 
-                    consoleUtil.clearScreen();
-                    displayMainScreen();  
-                }
-            }       
-        } else { // There is no empty card slot
-            consoleUtil.showError("You have reached max number of cards. You cannot create a new card until you delete one!");
-            displayMainScreen();
-        }
-        
+        } while (true);
     }
-    
-    void deleteSmartCard() {
-        consoleUtil.clearScreen();
-        System.out.print("Enter the Smart Card ID you want to delete: ");
-        int idToDelete = input.nextInt(); 
-        if(idToDelete < 0) {
-            consoleUtil.showError("ID cannot be negative");
+
+   void CreateSmartCardPage() {
+        if(!SmartCard.isAnySlotAvailable()) { // Check if no slots are empty (a)
+            ConsoleUtil.showError("There are no available slots to enter a new Smart Card!");
             displayMainScreen();
         }
         if (smartCard1 != null && smartCard1.getSmartCardID() == idToDelete) {
@@ -306,7 +263,6 @@ public class SystemInterface
             if(smartCard3 != null && !smartCard3.hasReachedMaxJourneys()) count++;
             return count;
         }
-        // Can  we remove this now??
         SmartCard getSmartCard(int index) { // Ugly function to get around the fact we cant use arrays. Allows you to index smartcards. I.e getSmartCard(2) returns the second available smart card.
             switch (index) {
                 case 0: 
@@ -314,15 +270,11 @@ public class SystemInterface
                 if(smartCard2 != null) return smartCard2;
                 if(smartCard3 != null) return smartCard3;
                 break;
-                case 1:
-                if (smartCard1 != null) {
-                    if(smartCard2 != null) return smartCard2;
-                    else if(smartCard3 != null) return smartCard3;
-                    return null;
-                }
+                case 2: // Bus
+                journeyType = "BUS";
                 break;
-                case 2:
-                if(smartCard3 != null) return smartCard3;
+                case 3: // Tram
+                journeyType = "TRAM";
                 break;
                 default:
                 return null;
@@ -330,7 +282,7 @@ public class SystemInterface
             return null;
         }
         // Checks if smartcard is created and if so prints it out. 
-        void listAllSmartCards() { // need to add loop
+        void listAllSmartCards() { 
             consoleUtil.clearScreen();
             if(!smartCardUtil.isAnySmartCardsCreated()) {
                 consoleUtil.showError("No Smartcards exist to be displayed!");
@@ -365,93 +317,80 @@ public class SystemInterface
     public class ConsoleUtil {
         public void waitForKeyPress() { // Wait for user to press Enter Key before proceeding with code execution.
             System.out.println("<Press Enter to Continue>");
-            input.nextLine(); // consume remaining characters from inputs.
-            input.nextLine(); // wait for user input.
+            try{System.in.read();}
+            catch(Exception e){}
             
             
         }
-        public void clearScreen() { // Creates a lot of new lines to clear the window -> Not system specific unlike "cls" for windows.
+        public static void clearScreen() { // Creates a lot of new lines to clear the window -> Not system specific unlike "cls" for windows.
         System.out.println(System.lineSeparator().repeat(100));
         }
-        public void showError(String errorMessage) {
-            consoleUtil.clearScreen();
-            System.out.println("==============================Error==============================");
-            System.out.println(errorMessage);
-            System.out.println("=================================================================");
-            consoleUtil.waitForKeyPress();
-            consoleUtil.clearScreen();
+        public static String GetString(String inputMessage) {
+            System.out.print(inputMessage);
+            String inputText = input.next();
+            input.nextLine();
+            return inputText;
         }
-    
-    }
-
-    
-
-    void calculateAndDisplayFareCosts() {
-        double totalFare = 0;
-        boolean journeysCompleted = false; // Flag to track if any journeys have been completed
-    
-        System.out.println("Total transport mode journeys cost/fare:");
-        System.out.println("---------------------------------------------------------");
-    
-        // Calculate total fare for all journeys
-        for (int i = 0; i < smartCardUtil.getSmartCardCount(); i++) {
-            SmartCard currentCard = smartCardUtil.getSmartCard(i);
-            if (currentCard != null) {
-                for (int j = 0; j < currentCard.getJourneyCount(); j++) {
-                    Journey journey = currentCard.getJourney(j);
-                    if (journey != null) {
-                        double fare = calculateFare(journey.getTransportMode(), currentCard.getType(), journey.getDistanceOfJourney());
-                        totalFare += fare;
-                        System.out.println("Total cost of " + journey.getTransportMode() + " journeys is $" + fare);
-                        journeysCompleted = true; // Set flag to true as at least one journey is found
-                    }
+        public static int GetInt(String inputMessage) {
+            boolean isValidInput = false;
+            int nextIntInput = 0;
+            while (!isValidInput) {
+                System.out.print(inputMessage);
+                if(!input.hasNextInt()) {
+                    showError("Invalid Integer input!");
+                    input.next();
+                } else {
+                    try {
+                        nextIntInput = input.nextInt();
+                        input.nextLine();
+                        isValidInput = true;
+                    } catch (Exception e) {}
                 }
+
             }
+            return nextIntInput;
         }
-    
-        // Check if any journeys have been completed
-        if (!journeysCompleted) {
-            System.out.println("No journeys are being completed yet.");
-        } else {
-            // Display total fare
-            System.out.println("---------------------------------------------------------");
-            System.out.println("Total Fare: $" + totalFare);
-    
-            // Breakdown by smart card
-            System.out.println("Breakdown by smartcard:");
-            System.out.println("---------------------------------------------------------");
-            for (int i = 0; i < smartCardUtil.getSmartCardCount(); i++) {
-                SmartCard currentCard = smartCardUtil.getSmartCard(i);
-                if (currentCard != null) {
-                    double cardFare = 0;
-                    for (int j = 0; j < currentCard.getJourneyCount(); j++) {
-                        Journey journey = currentCard.getJourney(j);
-                        if (journey != null) {
-                            cardFare += calculateFare(journey.getTransportMode(), currentCard.getType(), journey.getDistanceOfJourney());
+        public static int GetInt(String inputMessage, int min, int max) {
+            boolean isValidInput = false;
+            int nextIntInput = 0;
+            while (!isValidInput) {
+                System.out.print(inputMessage);
+                if(!input.hasNextInt()) {
+                    showError("Invalid Integer input!");
+                    input.next();
+                } else {
+                    try {
+                        nextIntInput = input.nextInt();
+                        input.nextLine();
+                        isValidInput = true;
+                        if(nextIntInput > max || nextIntInput < min) {
+                            isValidInput = false;
+                            showError("Enter number between " + min + " and " + max + "!");
                         }
-                    }
-                    System.out.println("SmartCard " + currentCard.getSmartCardID() + ":");
-                    System.out.println("Total fare: $" + cardFare);
+                    } catch (Exception e) {}
                 }
+
             }
+            return nextIntInput;
         }
-    }
-    
-        double calculateFare(String transportMode, char cardType, int distanceOfJourney) {
-        double baseFare = 1.5; // Base fare for all types of smart cards
-        double farePerDistance;
-        switch (Character.toUpperCase(cardType)) {
-            case 'C':
-                farePerDistance = 1.86;
-                break;
-            case 'A':
-                farePerDistance = 2.24;
-                break;
-            case 'S':
-                farePerDistance = 1.60;
-                break;
-            default:
-                farePerDistance = 0;
+        public static double GetDouble(String inputMessage) {
+            boolean isValidInput = false;
+            double nextDoubleInput = 0;
+            while (!isValidInput) {
+                System.out.print(inputMessage);
+                if(!input.hasNextDouble()) {
+                    showError("Invalid Double input!");
+                    input.next();
+                } else {
+                    try {
+                        nextDoubleInput = input.nextDouble();
+                        input.nextLine();
+                        isValidInput = true;
+                    } catch (Exception e) {}
+                }
+
+            }
+            return nextDoubleInput;
         }
         double totalFare = baseFare + farePerDistance * distanceOfJourney;
         totalFare = Math.round(totalFare * 100.0) / 100.0;
@@ -521,7 +460,6 @@ public class SystemInterface
         displayMainScreen();
     }
     void listJourneysOnSmartCard() {
-        // Need to add a loop
         if(!smartCardUtil.isAnySmartCardsCreated()) {
             consoleUtil.showError("No Smartcards exist yet to display any journeys!");
             displayMainScreen();
@@ -555,42 +493,6 @@ public class SystemInterface
             }
         }
     }
-
-    // Saves all smartcard and journey information into a new txt file
-    void createfile() {
-        try (PrintWriter writer = new PrintWriter("smartcards.txt")) {
-            if (smartCard1 != null) writer.println(smartCard1.toString());
-            if (smartCard2 != null) writer.println(smartCard2.toString());
-            if (smartCard3 != null) writer.println(smartCard3.toString());
-            System.out.println("File saved successfully.");
-        } catch (FileNotFoundException e) {
-            System.out.println("Error saving file: " + e.getMessage());
-        }
-    }
-
-    // Imports smartcard and journey information into program from a txt file
-    void importfile() {
-        try (BufferedReader reader = new BufferedReader(new FileReader("smartcards.txt"))) {
-            String line;
-            SmartCard[] importedCards = new SmartCard[3];
-            int index = 0;
-            while ((line = reader.readLine()) != null) {
-                SmartCard smartCard = SmartCard.fromString(line);
-                if (index < importedCards.length) {
-                    importedCards[index++] = smartCard;
-                }
-            }
-            if (importedCards.length > 0) {
-                if (importedCards[0] != null) smartCard1 = importedCards[0];
-                if (importedCards[1] != null) smartCard2 = importedCards[1];
-                if (importedCards[2] != null) smartCard3 = importedCards[2];
-            }
-            System.out.println("File imported successfully.");
-        } catch (IOException e) {
-            System.out.println("Error importing file: " + e.getMessage());
-        }
-    }
-
     public static void main(String[] args)
     {
         SystemInterface systemUI = new SystemInterface();
