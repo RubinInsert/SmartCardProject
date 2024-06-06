@@ -1,3 +1,7 @@
+// Sam Bosworth - Student Number: c3477699
+// Alex Rubin - Student Number: c3486124
+
+
 /*
  * This class represents a SmartCard used for managing travel on the public transport network.
  * It stores the following details about a smartcard:
@@ -14,12 +18,11 @@
  */
 
 public class SmartCard {
+    
     private int cardID;           // the id of the smartcard
     private char type;            // the type of the smartcard (it can be "C", "A" or "S")
     private double balance;       // the balance available on the smartcard
-    private Journey journey1;
-    private Journey journey2; // Only available for Adults and Seniors
-    private Journey journey3; // Only available for Seniors
+    private Journey[] journeys;
     /**
      * Constructs a SmartCard object with the given card ID, type, and balance.
      * @param cardID The ID of the smartcard.
@@ -30,6 +33,7 @@ public class SmartCard {
         this.cardID = cardID;
         this.type = type;
         this.balance = balance;
+        this.journeys = new Journey[getMaxJourneys()];
     }
 
     /**
@@ -66,7 +70,7 @@ public class SmartCard {
     public double getBalance() {
         return balance;
     }
-
+    
     /**
      * Adds the specified amount to the balance of the smartcard.
      * @param amount The amount to add to the balance.
@@ -91,88 +95,119 @@ public class SmartCard {
     public boolean canDeduct(double amount) {
         return balance >= amount;
     }
-    public boolean hasReachedMaxJourneys() { // Determines whether a card has reached the capacity of Journeys it's specific type can hold.
+    public int getMaxJourneys() {
         switch (type) {
             case 'C': // Children can have a maximum of 1 Journey
-                if(journey1 != null) return true;
-                break;
+                return 1;
             case 'A': // Adults can have a maxiumum of 2 Journeys
-                if(journey1 != null && journey2 != null) return true;
+                return 2;
+            case 'S': // Seniors can have a maximum of 3 Journeys
+                return 3;
+            default:
+                return 0;
+        }
+    }
+    public boolean isDuplicateJourney(Journey j) {
+        for(int x = 0; x < journeys.length; x++) {
+            if(journeys[x] == null) continue;
+            if(j.getStartOfJourney() == journeys[x].getStartOfJourney() && j.getEndOfJourney() == journeys[x].getEndOfJourney() && j.getTransportMode() == journeys[x].getTransportMode())  return true;
+        }
+        return false;
+    }
+    public boolean hasReachedMaxJourneys() { // Broken dont use yet.
+        switch (type) {
+            case 'C': // Children can have a maximum of 1 Journey
+                if(journeys.length >= 1) return true;
+            case 'A': // Adults can have a maxiumum of 2 Journeys
+                if(journeys.length >= 2) return true;
             break;
             case 'S': // Seniors can have a maximum of 3 Journeys
-                if(journey1 != null && journey2 != null && journey3 != null) return true;
+                if(journeys.length >= 3) return true;
             break;
             default:
                 return false;
         }
         return false;
     }
-    public int getJourneyCount() { // returns number of journeys on the card
-        int count = 0;
-        if(journey1 != null) count++;
-        if(journey2 != null) count++;
-        if(journey3 != null) count++;
-        return count;
+    public Journey[] getJourneys() {
+        return journeys;
     }
-    public void addJourney(Journey j) {
-        reorganiseJourneys();
-        if(journey1 == null) journey1 = j;
-        else if(journey2 == null) journey2 = j;
-        else if(journey3 == null) journey3 = j;
-    }
-    private void reorganiseJourneys() { // Removes gaps in the 3 Journey variables ( if user deletes one etc. ).
-        if(journey1 == null) {
-            journey1 = journey2;
-            journey2 = journey3;
+    public Journey getJourneyByID(int id) { // returns null if no journey found with ID.
+        for(int x = 0; x < journeys.length; x++ ) {
+            if(journeys[x] == null) continue;
+            if(journeys[x].getJourneyID() == id) return journeys[x];
         }
-        if(journey2 == null) {
-            journey2 = journey3;
+        return null;
+    }
+    public void deleteJourneyByID(int id) {
+        for(int x = 0; x < journeys.length; x ++) {
+            if(journeys[x] == null) continue;
+            if(journeys[x].getJourneyID() == id) journeys[x] = null;
         }
     }
-    Journey getJourney(int index) {
-        reorganiseJourneys();
-        switch (index) {
-            case 0: 
-                return journey1;
-            case 1:
-                return journey2;
-            case 2:
-                return journey3;
-            default:
-            return null;
+    public static int FillFirstEmpty(SmartCard sc) { // returns index the smartcard was placed at. Returns -1 if no slot was found.
+        for(int x = 0; x < SystemInterface.smartCards.length; x++) {
+            
+            if(SystemInterface.smartCards[x] == null) {
+                SystemInterface.smartCards[x] = sc;
+                return x;
+            }
+        }
+        return -1;
+    }
+    public int FillFirstEmptyJourney(Journey j) { // returns index the smartcard was placed at. Returns -1 if no slot was found.
+        for(int x = 0; x < journeys.length; x++) {
+            
+            if(journeys[x] == null) {
+                journeys[x] = j;
+                j.setParentCard(this);
+                return x;
+            }
+        }
+        return -1;
+    }
+    public static boolean isAnySlotAvailable() {
+        for(int x = 0; x < SystemInterface.smartCards.length; x++) {
+            if(SystemInterface.smartCards[x] == null) return true; // a slot will NULL found.
+        }
+        return false; // no slots available
+    }
+    public static SmartCard getFromID(int id) { // Returns null if not found.
+        for(int x = 0; x < SystemInterface.smartCards.length; x++) {
+            if(SystemInterface.smartCards[x] == null) continue;
+            if(SystemInterface.smartCards[x].cardID == id) return SystemInterface.smartCards[x];
+        }
+        return null;
+    }
+    public void Delete() {
+        for(int x = 0; x < SystemInterface.smartCards.length; x++) {
+            if(SystemInterface.smartCards[x] == this) SystemInterface.smartCards[x] = null;
         }
     }
-    void print() {
-        System.out.println("Smartcard " + this.getSmartCardID() + " has type " + this.getTypeFormatted() + " and " + this.getJourneyCount() + " journey(s)");
-        for(int x=0; x < this.getJourneyCount(); x++) {
-            if(this.getJourney(x) != null) this.getJourney(x).printTruncated();
+    public static int getTotalCards() { // returns number of cards currently existing
+        int y = 0;
+        for(int x = 0; x < SystemInterface.smartCards.length; x++) {
+            if(SystemInterface.smartCards[x] != null) {
+                y++;
+            }
         }
-    } 
-
-    
-    // Method to delete a journey by its ID (K)
-    
-    public void deleteJourney(int journeyID) {
-        // Check if the journeyID matches any existing journey and delete it
-        if (journey1 != null && journey1.getJourneyID() == journeyID) {
-            journey1 = null;
-            System.out.println("Journey with ID " + journeyID + " has been deleted.");
-        } else if ((type == 'A' || type == 'S') && journey2 != null && journey2.getJourneyID() == journeyID) {
-            journey2 = null;
-            System.out.println("Journey with ID " + journeyID + " has been deleted.");
-        } else if (type == 'S' && journey3 != null && journey3.getJourneyID() == journeyID) {
-            journey3 = null;
-            System.out.println("Journey with ID " + journeyID + " has been deleted.");
-        } else {
-            System.out.println("Journey with ID " + journeyID + " not found or cannot be deleted.");
+        return y;
+    }
+    public int getTotalJourneys() {
+        int y = 0;
+        for(int x = 0; x < journeys.length; x++) {
+            if(journeys[x] != null) {
+                y++;
+            }
         }
+        return y;
     }
     /**
      * Checks if the given card type is valid ("C", "A", or "S").
      * @param type The card type to check.
      * @return true if the type is valid, otherwise false.
      */
-    public boolean isValidType(char type) {
+    public static boolean isValidType(char type) {
         return type == 'C' || type == 'A' || type == 'S';
 
 
