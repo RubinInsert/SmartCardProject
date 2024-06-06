@@ -79,7 +79,7 @@ public class SystemInterface
         String cardType = ConsoleUtil.GetString("Enter a Smartcard type ('C' for Child, 'A' for Adult, or 'S' for Senior): ");
         while(!SmartCard.isValidType(cardType.toUpperCase().charAt(0))) { // Ensure SmartCard type is either 'C', 'A', or 'S'. Menu cannot be used as brief specifies something is inputted. (d)
             ConsoleUtil.showError("Ensure your response is either 'C', 'A', or 'S'.");
-            cardType = ConsoleUtil.GetString("Enter a Smartcard type ('C' for Child, 'A' for Adult, or 'S' for Senior): ");
+            cardType = ConsoleUtil.GetString("Enter a Smartcard type ('C' for Child, 'A' for Adult, or 'S' for Senior): ").toUpperCase();
         }
         SmartCard smartCard = new SmartCard(newCardID, cardType.charAt(0), cardBalance);
         SmartCard.FillFirstEmpty(smartCard); // Add newly created smart card to index of smartcards
