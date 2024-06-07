@@ -1,6 +1,6 @@
 // Sam Bosworth - Student Number: c3477699
 // Alex Rubin - Student Number: c3486124
-public class Journey {
+public class Journey { 
     private int journeyID;
     private String transportMode;
     private int startOfJourney;
@@ -14,7 +14,6 @@ public class Journey {
         this.endOfJourney = endOfJourney;
         this.distanceOfJourney = distanceOfJourney;
     }
-
     // Getters and Setters
     public int getJourneyID() {
         return journeyID;

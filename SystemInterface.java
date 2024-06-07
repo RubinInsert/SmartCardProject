@@ -1,7 +1,7 @@
 // Sam Bosworth - Student Number: c3477699
 // Alex Rubin - Student Number: c3486124
-import java.io.Console;
 import java.util.Scanner;
+import java.io.*;
 public class SystemInterface
 {
     static Scanner input;
@@ -42,7 +42,6 @@ public class SystemInterface
                 case 4:
                 ListAllSmartCardsPage();
                     // List all Smart Cards
-                
                     break;
                 case 5:
                     ListAllJourneysSpecificTransportPage();
@@ -58,14 +57,83 @@ public class SystemInterface
                     break;
                 case 8:
                     // Import Smartcards and Journeys from external file
+                    importSmartCardsAndJourneysPage();
                     break;
                 case 9:
-                    // Export Smartcards and Journey to external file
+                    // export Smartcards and Journeys to external file
+                    exportSmartCardsAndJourneysPage();
                     break;
                 default:
                     ConsoleUtil.showError("Invalid input. Please enter a number between 1 and 8.");
             }
         } while (true);
+    }
+    //Import Smartcards and Journeys from external file
+    void importSmartCardsAndJourneysPage() {
+        ConsoleUtil.clearScreen();
+        System.out.print("Enter the file name to import: ");
+        String fileName = input.next();
+        try (Scanner inputStream = new Scanner(new File(fileName))) {
+            int index = 0;
+            while (inputStream.hasNextLine() && index < smartCards.length) {
+                String line = inputStream.nextLine();
+                String[] data = line.split(",");
+                int id = Integer.parseInt(data[0]);
+                char type = data[1].charAt(0);
+                double balance = Double.parseDouble(data[2]);
+                SmartCard smartCard = new SmartCard(id, type, balance);
+                smartCards[index++] = smartCard;
+
+                for (int i = 3; i < data.length; i += 5) {
+                    int journeyID = Integer.parseInt(data[i]);
+                    String transportMode = data[i + 1];
+                    int start = Integer.parseInt(data[i + 2]);
+                    int end = Integer.parseInt(data[i + 3]);
+                    int distance = Integer.parseInt(data[i + 4]);
+                    Journey journey = new Journey(journeyID, transportMode, start, end, distance);
+                    smartCard.FillFirstEmptyJourney(journey);
+                }
+            }
+            System.out.println("Smart Cards and Journeys imported successfully!");
+        } catch (FileNotFoundException e) {
+            ConsoleUtil.showError("File not found: " + fileName);
+        } catch (Exception e) {
+            ConsoleUtil.showError("An error occurred while importing data.");
+        }
+        ConsoleUtil.waitForKeyPress();
+        ConsoleUtil.clearScreen();
+    }
+    // Export Smartcards and Journeys from external file
+    void exportSmartCardsAndJourneysPage() {
+        ConsoleUtil.clearScreen();
+        System.out.print("Enter the file name to export to: ");
+        String fileName = input.next();
+        try (PrintWriter outFile = new PrintWriter(fileName)) {
+            for (SmartCard smartCard : smartCards) {
+                if (smartCard == null) continue;
+                outFile.println("SmartCard");
+                outFile.println("ID " + smartCard.getSmartCardID());
+                outFile.println("Type " + smartCard.getTypeFormatted());
+                outFile.println("Balance " + smartCard.getBalance());
+                outFile.println("Journeys");
+                for (Journey journey : smartCard.getJourneys()) {
+                    if (journey == null) continue;
+                    outFile.println("ID " + journey.getJourneyID());
+                    outFile.println("Mode " + journey.getTransportMode());
+                    outFile.println("Start " + journey.getStartOfJourney());
+                    outFile.println("End " + journey.getEndOfJourney());
+                    outFile.println("Distance " + journey.getDistanceOfJourney());
+                }
+                outFile.println(); // Add a blank line after each SmartCard's journeys
+            }
+            System.out.println("Smart Cards and Journeys exported successfully!");
+        } catch (FileNotFoundException e) {
+            ConsoleUtil.showError("File not found: " + fileName);
+        } catch (Exception e) {
+            ConsoleUtil.showError("An error occurred while exporting data.");
+        }
+        ConsoleUtil.waitForKeyPress();
+        ConsoleUtil.clearScreen();
     }
 
    void CreateSmartCardPage() {
@@ -148,6 +216,7 @@ public class SystemInterface
         ConsoleUtil.showError("Smart Card with ID #" + userInputCardID + " could not be found!");
     }      
    }
+    // List all Smart Cards and Journeys.
    void ListAllSmartCardsPage() {
         ConsoleUtil.clearScreen();
         if(SmartCard.getTotalCards() == 0) {
@@ -166,6 +235,7 @@ public class SystemInterface
         }
         ConsoleUtil.waitForKeyPress();
    }
+   // List all Smart Cards and Journeys with a specific transport mode.
    void ListAllJourneysSpecificTransportPage() {
     if(SmartCard.getTotalCards() == 0) {
         ConsoleUtil.showError("There are no Smart Cards Created yet!");

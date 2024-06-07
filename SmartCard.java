@@ -16,13 +16,12 @@
  *   - Check if the balance is sufficient for a journey.
  *   - Check if a given card type is valid.
  */
-
-public class SmartCard {
-    
+public class SmartCard { 
     private int cardID;           // the id of the smartcard
     private char type;            // the type of the smartcard (it can be "C", "A" or "S")
     private double balance;       // the balance available on the smartcard
     private Journey[] journeys;
+    //private int maxJourneys;
     /**
      * Constructs a SmartCard object with the given card ID, type, and balance.
      * @param cardID The ID of the smartcard.
